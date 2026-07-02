@@ -1,5 +1,5 @@
 window.AI_MEMORY_VAULT_CONFIG = {
-  supabaseUrl: "https://jjj.supabase.co",
+  supabaseUrl: "",
   supabaseAnonKey: "",
   autoApproveByDefault: true
 };

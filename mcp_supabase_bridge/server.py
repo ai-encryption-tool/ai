@@ -13,12 +13,13 @@ from mcp.server.fastmcp import FastMCP
 
 load_dotenv()
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://qhadbdhelbfycszzjehm.supabase.co").rstrip("/")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "sb_publishable_ddGwnfuPOt9BShap3zoRJg_c3p3GdA6")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 SUPABASE_EMAIL = os.getenv("SUPABASE_EMAIL", "")
 SUPABASE_PASSWORD = os.getenv("SUPABASE_PASSWORD", "")
 VAULT_PASSPHRASE = os.getenv("VAULT_PASSPHRASE", "")
 DEFAULT_APPROVED = os.getenv("DEFAULT_APPROVED", "true").lower() == "true"
+SUPABASE_SSL_VERIFY = os.getenv("SUPABASE_SSL_VERIFY", "true")
 
 mcp = FastMCP("AI Memory Vault Supabase")
 
@@ -30,6 +31,13 @@ class Session:
 
 
 _session: Session | None = None
+
+
+def ssl_verify() -> bool | str:
+    value = SUPABASE_SSL_VERIFY.strip()
+    if value.lower() in {"0", "false", "no", "off"}:
+        return False
+    return value if value.lower() not in {"1", "true", "yes", "on"} else True
 
 
 def require_config() -> None:
@@ -53,7 +61,7 @@ async def login() -> Session:
     require_config()
     if _session:
         return _session
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with httpx.AsyncClient(timeout=30, verify=ssl_verify()) as client:
         response = await client.post(
             f"{SUPABASE_URL}/auth/v1/token",
             params={"grant_type": "password"},
@@ -124,7 +132,7 @@ def encrypt_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 async def encrypted_rows() -> list[dict[str, Any]]:
     headers = await auth_headers()
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with httpx.AsyncClient(timeout=30, verify=ssl_verify()) as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/memories",
             params={"select": "*", "order": "updated_at.desc"},
@@ -196,7 +204,7 @@ async def create_memory(
     encrypted = encrypt_payload(payload)
     headers = await auth_headers()
     headers["Prefer"] = "return=representation"
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with httpx.AsyncClient(timeout=30, verify=ssl_verify()) as client:
         response = await client.post(
             f"{SUPABASE_URL}/rest/v1/memories",
             params={"select": "*"},
@@ -218,7 +226,7 @@ async def approve_memory(id: str) -> dict[str, Any]:
             encrypted = encrypt_payload(payload)
             headers = await auth_headers()
             headers["Prefer"] = "return=representation"
-            async with httpx.AsyncClient(timeout=30) as client:
+            async with httpx.AsyncClient(timeout=30, verify=ssl_verify()) as client:
                 response = await client.patch(
                     f"{SUPABASE_URL}/rest/v1/memories",
                     params={"id": f"eq.{id}", "select": "*"},

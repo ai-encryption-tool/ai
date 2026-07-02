@@ -4,7 +4,7 @@ This project is now configured for self-service signup:
 
 - New Supabase users default to `approved`.
 - The web app uses Supabase Auth and client-side encryption.
-- The extension includes the Supabase URL and anon key in `browser_extension/config.js`.
+- The public repository keeps `browser_extension/config.js` blank. For your official packaged extension, fill it with your Supabase URL and publishable/anon key before zipping or store submission.
 - Users only need email/password and their vault passphrase.
 
 ## 1. Supabase SQL
@@ -69,8 +69,8 @@ Environment variables:
 
 ```env
 VITE_STORAGE_MODE=supabase
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
 ```
 
 ## 4. Extension Package
@@ -81,7 +81,7 @@ The extension is configured in:
 browser_extension/config.js
 ```
 
-Users will not need to enter Supabase URL or anon key.
+For a public GitHub repo, leave the values blank so visitors do not get your project settings by mistake. If you publish your own extension package, add your Supabase URL and publishable/anon key before creating the zip. The publishable/anon key is not a service-role secret, but it is still project-specific.
 
 For local testing:
 

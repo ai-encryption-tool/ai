@@ -3,17 +3,22 @@ import {
   BarChart3,
   Check,
   Clock3,
+  Coffee,
   Download,
   Edit3,
   FileUp,
+  Github,
+  HeartHandshake,
   KeyRound,
   Lock,
   LogOut,
   Plus,
   RefreshCw,
+  Rocket,
   Search,
   ShieldCheck,
   Sparkles,
+  Trophy,
   Trash2,
   Upload,
   UserPlus,
@@ -24,6 +29,13 @@ import { isSupabaseConfigured, supabase } from "./supabaseClient.js";
 
 const memoryTypes = ["project", "person", "preference", "skill", "goal", "decision", "fact", "note", "writing_style", "private_note"];
 const sources = ["manual", "chatgpt", "claude", "cursor", "browser_extension", "import_center", "api"];
+const githubRepoUrl = "https://github.com/ai-encryption-tool/ai";
+const paypalMeUrl = "https://www.paypal.com/paypalme/RajendraDidel771";
+const supportTiers = [
+  { label: "EUR5 Coffee", icon: Coffee, url: `${paypalMeUrl}/5` },
+  { label: "EUR20 Sponsor", icon: Rocket, url: `${paypalMeUrl}/20` },
+  { label: "EUR100 Company Sponsor", icon: Trophy, url: `${paypalMeUrl}/100` },
+];
 const navItems = [
   ["overview", "Overview"],
   ["suggestions", "Suggestions"],
@@ -86,6 +98,7 @@ export default function SupabaseVaultApp() {
   const [importResult, setImportResult] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -415,6 +428,34 @@ export default function SupabaseVaultApp() {
           <p>{session.user.email} | {profile?.status} | encrypted rows {vaultStats.encrypted}, decrypted {vaultStats.decrypted}, failed {vaultStats.failed}</p>
         </div>
         <div className="actions">
+          <div className="support-menu">
+            <button
+              aria-expanded={supportOpen}
+              aria-haspopup="true"
+              onClick={() => setSupportOpen((open) => !open)}
+              title="Support development"
+            >
+              <HeartHandshake size={18} /> Support
+            </button>
+            {supportOpen && (
+              <div className="support-popover">
+                <strong>Support Development</strong>
+                <a href={githubRepoUrl} target="_blank" rel="noreferrer" onClick={() => setSupportOpen(false)}>
+                  <Github size={16} /> Star on GitHub
+                </a>
+                <a href={paypalMeUrl} target="_blank" rel="noreferrer" onClick={() => setSupportOpen(false)}>
+                  <Coffee size={16} /> Buy me a coffee
+                </a>
+                <div className="support-tiers">
+                  {supportTiers.map(({ label, icon: Icon, url }) => (
+                    <a key={label} href={url} target="_blank" rel="noreferrer" onClick={() => setSupportOpen(false)}>
+                      <Icon size={16} /> {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <button onClick={loadMemories} title="Refresh"><RefreshCw size={18} /></button>
           <button onClick={exportJson} title="Export decrypted JSON"><Download size={18} /></button>
           <button onClick={signOut} title="Sign out"><LogOut size={18} /></button>

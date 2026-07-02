@@ -12,7 +12,7 @@ The extension now uses the same hosted Supabase vault as the web app. It no long
 
 ## 2. Configure Supabase
 
-Open the extension and click **Settings**.
+For public GitHub installs, open the extension and click **Settings**.
 
 Fill:
 
@@ -22,6 +22,8 @@ Supabase anon key: YOUR_SUPABASE_ANON_KEY
 ```
 
 These are the same values used by the web app in `frontend/.env.local`.
+
+For your own official packaged extension, you can set these values in `browser_extension/config.js` before packaging. When that file has real values, users will only need to sign in and enter their vault passphrase.
 
 ## 3. Sign In
 
@@ -64,3 +66,9 @@ If **Auto-approve new memories** is off, the saved memory is pending and will no
 7. Paste the copied context into the AI chat.
 
 Search happens locally after encrypted memories are downloaded and decrypted in the extension.
+
+## Screenshots
+
+![AI Memory Vault extension saving a chat transcript](images/extension-save-chat.png)
+
+![AI Memory Vault extension searching approved memories](images/extension-search-vault.png)

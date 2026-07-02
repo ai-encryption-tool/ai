@@ -13,9 +13,7 @@ AI Memory Vault gives you memory for every AI.
 
 ## Developer
 
-
 AI Memory Vault is developed and maintained by **Rajendra Didel**.
-
 
 The project is built as a privacy-first personal AI memory tool: users own their memory data, and hosted memory content is encrypted in the browser before it is stored.
 
@@ -28,11 +26,8 @@ In hosted mode, memory content is encrypted in the browser before it is stored. 
 ## Hosted App
 
 Current deployment:
-[Live Demo](https://ai-7pk.pages.dev/)
-```text
-https://ai-7pk.pages.dev/
-``` 
 
+[Live Demo](https://ai-7pk.pages.dev/)
 
 Hosted stack:
 
@@ -46,17 +41,24 @@ Production setup notes:
 - Cloudflare Pages must serve the app over HTTPS because Web Crypto is required for encryption.
 - New Supabase users can be self-service approved if `profiles.status` defaults to `approved`.
 - Users who forget their vault passphrase cannot recover encrypted memory content.
-- The extension package is built from `browser_extension/`.
+- The extension package is built from `browser_extension/`. Public GitHub config is blank; fill `browser_extension/config.js` only when packaging your own official release.
 
 See:
 
 - [`docs/PRODUCTION_LAUNCH.md`](docs/PRODUCTION_LAUNCH.md)
 - [`docs/SUPABASE_DEPLOYMENT.md`](docs/SUPABASE_DEPLOYMENT.md)
 - [`docs/SUPABASE_EXTENSION.md`](docs/SUPABASE_EXTENSION.md)
-<<<<<<< HEAD
 - [`mcp_supabase_bridge/README.md`](mcp_supabase_bridge/README.md)
-=======
->>>>>>> 33bcc3394b0240ce24769bf8ef3a7068eb81c23b
+
+## Support Development
+
+AI Memory Vault is free to use. If it helps you, support the project:
+
+- [Star on GitHub](https://github.com/ai-encryption-tool/ai)
+- [Buy me a coffee](https://www.paypal.com/paypalme/RajendraDidel771)
+- [EUR5 Coffee](https://www.paypal.com/paypalme/RajendraDidel771/5)
+- [EUR20 Sponsor](https://www.paypal.com/paypalme/RajendraDidel771/20)
+- [EUR100 Company Sponsor](https://www.paypal.com/paypalme/RajendraDidel771/100)
 
 ## What is included
 
@@ -283,6 +285,8 @@ Local unpacked install for developers:
 
 In hosted mode, the extension uses the Supabase project configured in `browser_extension/config.js`. Users sign in with their account and enter their vault passphrase. They do not need a local backend URL or API key.
 
+For this public repository, `browser_extension/config.js` is intentionally blank. Users can enter their own Supabase URL and publishable/anon key in extension Settings. For your official release package, fill `browser_extension/config.js` before creating the zip so users do not need to enter provider settings.
+
 For public users, publish the packaged extension through Microsoft Edge Add-ons or the Chrome Web Store.
 
 Until the extension is published in a browser store, the GitHub download + **Load unpacked** flow is the free installation path.
@@ -319,14 +323,19 @@ Imported memories are always pending and must be approved before normal retrieva
 
 ## Screenshots
 
-Run the app, then capture:
+Dashboard with encrypted memories:
 
-- Overview: `http://localhost:8081/`
-- Ask Memory: `http://localhost:8081/ask-memory`
-- Suggestions: `http://localhost:8081/suggestions`
-- Timeline: `http://localhost:8081/timeline`
-- Imports: `http://localhost:8081/imports`
-- Product page: `http://localhost:8081/landing`
+![AI Memory Vault dashboard with encrypted memories](docs/images/dashboard-memories.png)
+
+Browser extension inside ChatGPT:
+
+![AI Memory Vault browser extension opened on ChatGPT](docs/images/extension-chatgpt.png)
+
+Extension save and retrieval workflows:
+
+![AI Memory Vault extension saving a chat transcript](docs/images/extension-save-chat.png)
+
+![AI Memory Vault extension searching approved memories](docs/images/extension-search-vault.png)
 
 ## Testing
 
