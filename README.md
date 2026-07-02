@@ -13,11 +13,9 @@ AI Memory Vault gives you memory for every AI.
 
 ## Developer
 
-<<<<<<< HEAD
-AI Memory Vault is developed and maintained by **Diderajern04**.
-=======
+
 AI Memory Vault is developed and maintained by **Rajendra Didel**.
->>>>>>> 33bcc3394b0240ce24769bf8ef3a7068eb81c23b
+
 
 The project is built as a privacy-first personal AI memory tool: users own their memory data, and hosted memory content is encrypted in the browser before it is stored.
 
