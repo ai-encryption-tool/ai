@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="sidebar.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>AI Memory Vault</h1>
+        </div>
+        <span id="connectionDot" class="dot"></span>
+      </header>
+      <p id="status" class="status-line">Ready.</p>
+
+      <section class="choice-grid">
+        <button id="showSaveFlow">Save Memory</button>
+        <button id="showUseFlow">Use Vault</button>
+        <button id="showSettingsFlow" class="secondary">Options</button>
+      </section>
+
+      <section id="authPanel" class="panel">
+        <h2>Sign in</h2>
+        <label>Email<input id="email" type="email" placeholder="you@example.com" /></label>
+        <label>Password<input id="password" type="password" placeholder="Supabase password" /></label>
+        <div class="row">
+          <button id="signIn">Sign in</button>
+          <button id="signUp" class="secondary">Sign up</button>
+        </div>
+      </section>
+
+      <section id="vaultPanel" class="panel hidden">
+        <div class="row between">
+          <span id="accountStatus" class="meta">Signed in</span>
+          <button id="signOut" class="secondary">Sign out</button>
+        </div>
+        <label>Vault passphrase<input id="passphrase" type="password" placeholder="Same passphrase as web vault" /></label>
+        <p class="meta">The passphrase is only used locally to encrypt and decrypt memories.</p>
+      </section>
+
+      <section id="saveFlow" class="panel flow-panel hidden">
+        <h2>Save Chat</h2>
+        <button id="extractChat">Preview current chat</button>
+        <textarea id="chatPreview" placeholder="Conversation preview appears here before anything is sent."></textarea>
+        <button id="saveFullChat">Save full chat transcript</button>
+        <button id="generateSuggestions">Generate memory suggestions</button>
+        <h2>Suggested Memories</h2>
+        <div id="suggestions"></div>
+      </section>
+
+      <section id="useFlow" class="panel flow-panel hidden">
+        <h2>Search Vault</h2>
+        <input id="searchQuery" placeholder="Search approved memories" />
+        <button id="searchVault">Search</button>
+        <div id="searchResults"></div>
+        <h2>Insert Context</h2>
+        <button id="findRelevant">Find relevant memory for current prompt</button>
+        <button id="useVaultContext">Use Vault Context</button>
+        <p class="meta">Context text is generated here and copied. Paste it into the AI chat yourself.</p>
+        <textarea id="contextText" placeholder="Generated context text appears here."></textarea>
+        <button id="copyContext" class="secondary">Copy context text</button>
+      </section>
+
+      <section id="settingsFlow" class="panel hidden">
+        <h2>Options</h2>
+        <label class="provider-setting">Supabase URL<input id="supabaseUrl" placeholder="https://YOUR_PROJECT.supabase.co" /></label>
+        <label class="provider-setting">Supabase anon key<input id="supabaseAnonKey" placeholder="ey..." /></label>
+        <label>Max memories<input id="maxMemories" type="number" min="1" max="10" value="5" /></label>
+        <label>Default source
+          <select id="defaultSource">
+            <option value="browser_extension">browser_extension</option>
+            <option value="chatgpt">chatgpt</option>
+            <option value="claude">claude</option>
+            <option value="gemini">gemini</option>
+            <option value="copilot">copilot</option>
+          </select>
+        </label>
+        <label class="check"><input id="autoApprove" type="checkbox" /> Auto-approve new memories</label>
+        <button id="checkStatus" class="secondary">Check connection</button>
+      </section>
+    </main>
+    <script src="config.js"></script>
+    <script src="sidebar_supabase.js"></script>
+  </body>
+</html>

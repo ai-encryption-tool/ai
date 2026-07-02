@@ -1,0 +1,48 @@
+body {
+  background: #f6f7f4;
+  color: #17211b;
+  font-family: Inter, system-ui, sans-serif;
+  margin: 0;
+  min-width: 320px;
+}
+
+main {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+label {
+  display: grid;
+  font-size: 0.85rem;
+  font-weight: 700;
+  gap: 0.3rem;
+}
+
+input {
+  border: 1px solid #cfd7cf;
+  border-radius: 8px;
+  font: inherit;
+  padding: 0.55rem;
+}
+
+button {
+  background: #1f5f4a;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0.7rem;
+}
+
+p {
+  color: #5e6b62;
+  margin: 0;
+}
+

@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "AI Memory Vault",
+  "version": "0.1.0",
+  "description": "Save and use encrypted AI Memory Vault context inside AI chat tools.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "http://localhost:8000/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "http://*/*",
+    "https://*/*",
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://copilot.microsoft.com/*"
+  ],
+  "action": {
+    "default_popup": "sidebar.html",
+    "default_title": "Save to Memory Vault"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

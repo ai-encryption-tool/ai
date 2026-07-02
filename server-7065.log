@@ -1,0 +1,22 @@
+INFO:     127.0.0.1:60115 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60117 - "POST /memories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60119 - "DELETE /memories/921dd134-ddfa-47a1-94ea-b360ad3c7cf8 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:53446 - "POST /auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56375 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49668 - "DELETE /memories/1d5341d3-8a4e-4758-a2eb-2feff047f0a3 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:56507 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64277 - "DELETE /memories/6ac8e848-8d93-4b26-8788-a2398d1e1514 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:58554 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62123 - "DELETE /memories/bf8d618e-6ab3-4d9a-ba11-972a1ace31b7 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:55803 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56035 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51076 - "POST /memories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65470 - "POST /memories HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52103 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53351 - "DELETE /memories/f142c3a4-4d29-4afc-9dac-27f3b24ad1d9 HTTP/1.1" 204 No Content
+INFO:     127.0.0.1:52709 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55583 - "POST /memories/7822572e-c455-4253-8df6-4005c22e9ec7/approval HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62695 - "GET /memories?include_pending=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51454 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62584 - "POST /memory/search HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:57951 - "POST /memory/search HTTP/1.1" 200 OK
