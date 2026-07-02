@@ -69,8 +69,8 @@ Environment variables:
 
 ```env
 VITE_STORAGE_MODE=supabase
-VITE_SUPABASE_URL=https://qhadbdhelbfycszzjehm.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_ddGwnfuPOt9BShap3zoRJg_c3p3GdA6
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
 ```
 
 ## 4. Extension Package
