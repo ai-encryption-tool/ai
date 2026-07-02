@@ -1,6 +1,6 @@
 # AI Memory Vault
 
-AI Memory Vault is a local-first personal AI memory layer. It stores memories that you approve, exposes them through a FastAPI API and an MCP server, and lets AI tools retrieve relevant context without sending your memory database to an external LLM.
+AI Memory Vault is a personal AI memory layer for saving and reusing context across AI tools. It supports a hosted Supabase mode with client-side encryption, plus a local FastAPI mode for self-hosted/private development.
 
 Core idea: one memory, many AIs, owned by the user.
 
@@ -11,9 +11,45 @@ ChatGPT has memory for ChatGPT.
 AI Memory Vault gives you memory for every AI.
 ```
 
+## Developer
+
+AI Memory Vault is developed and maintained by **Rajendra Didel**.
+
+The project is built as a privacy-first personal AI memory tool: users own their memory data, and hosted memory content is encrypted in the browser before it is stored.
+
 ## Why this is different from ChatGPT or Claude memory
 
 Hosted assistant memory is usually tied to one vendor account and controlled by that vendor's product surface. AI Memory Vault keeps the source of truth on your machine, uses explicit approval before memories are returned by default, and exposes the same memory layer to any compatible client through HTTP or MCP.
+
+In hosted mode, memory content is encrypted in the browser before it is stored. Supabase stores ciphertext, not readable memory text. The user's vault passphrase is never sent to Supabase.
+
+## Hosted App
+
+Current deployment:
+
+```text
+https://ai-7pk.pages.dev/
+```
+
+Hosted stack:
+
+- Frontend: React + Vite on Cloudflare Pages
+- Auth and database: Supabase Auth + Postgres + Row Level Security
+- Privacy: client-side AES-GCM encryption with a user vault passphrase
+- Extension: browser extension signs in with the same Supabase account and uses the same passphrase
+
+Production setup notes:
+
+- Cloudflare Pages must serve the app over HTTPS because Web Crypto is required for encryption.
+- New Supabase users can be self-service approved if `profiles.status` defaults to `approved`.
+- Users who forget their vault passphrase cannot recover encrypted memory content.
+- The extension package is built from `browser_extension/`.
+
+See:
+
+- [`docs/PRODUCTION_LAUNCH.md`](docs/PRODUCTION_LAUNCH.md)
+- [`docs/SUPABASE_DEPLOYMENT.md`](docs/SUPABASE_DEPLOYMENT.md)
+- [`docs/SUPABASE_EXTENSION.md`](docs/SUPABASE_EXTENSION.md)
 
 ## What is included
 
@@ -198,7 +234,23 @@ More MCP client setup examples are in [`docs/MCP_SETUP.md`](docs/MCP_SETUP.md).
 
 ## Browser extension
 
-Chrome first:
+The browser extension is included in this repository in the `browser_extension/` folder.
+
+Users can use it for free without waiting for a browser store release:
+
+1. Open the GitHub repository.
+2. Click **Code** -> **Download ZIP**.
+3. Unzip the downloaded file.
+4. Open `edge://extensions` or `chrome://extensions`.
+5. Enable **Developer mode**.
+6. Click **Load unpacked**.
+7. Select the `browser_extension/` folder.
+8. Open ChatGPT, Claude, Gemini, or Copilot.
+9. Click the AI Memory Vault extension.
+10. Sign in with the same account used in the web app.
+11. Enter the same vault passphrase.
+
+Local unpacked install for developers:
 
 1. Open `chrome://extensions`.
 2. Enable Developer mode.
@@ -212,21 +264,11 @@ Chrome first:
    - Search Vault -> Select memories -> Insert context
    - Type a prompt -> Use Vault Context
 
-Backend URL in the extension can be:
+In hosted mode, the extension uses the Supabase project configured in `browser_extension/config.js`. Users sign in with their account and enter their vault passphrase. They do not need a local backend URL or API key.
 
-```text
-http://localhost:8000
-```
+For public users, publish the packaged extension through Microsoft Edge Add-ons or the Chrome Web Store.
 
-That is the direct FastAPI backend. Opening `http://localhost:8000/` in a browser shows API status, while API docs live at `http://localhost:8000/docs`.
-
-During local frontend development, this also works:
-
-```text
-http://localhost:8081
-```
-
-The Vite dashboard proxies `/health`, `/memory`, `/memories`, `/auth`, and `/imports` to the backend.
+Until the extension is published in a browser store, the GitHub download + **Load unpacked** flow is the free installation path.
 
 The extension does not scrape in the background and never auto-sends messages. It only captures or inserts text when the user clicks.
 
