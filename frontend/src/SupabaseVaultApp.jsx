@@ -30,6 +30,7 @@ import { isSupabaseConfigured, supabase } from "./supabaseClient.js";
 const memoryTypes = ["project", "person", "preference", "skill", "goal", "decision", "fact", "note", "writing_style", "private_note"];
 const sources = ["manual", "chatgpt", "claude", "cursor", "browser_extension", "import_center", "api"];
 const githubRepoUrl = "https://github.com/ai-encryption-tool/ai";
+const extensionZipUrl = "https://github.com/ai-encryption-tool/ai/archive/refs/heads/main.zip";
 const paypalMeUrl = "https://www.paypal.com/paypalme/RajendraDidel771";
 const supportTiers = [
   { label: "EUR5 Coffee", icon: Coffee, url: `${paypalMeUrl}/5` },
@@ -374,21 +375,44 @@ export default function SupabaseVaultApp() {
   if (!session) {
     return (
       <main className="login-screen">
-        <form className="login-panel" onSubmit={submitAuth}>
-          {authMode === "signup" ? <UserPlus size={34} /> : <ShieldCheck size={34} />}
-          <h1>{authMode === "signup" ? "Create Account" : "AI Memory Vault"}</h1>
-          <p>{authMode === "signup" ? "Create your encrypted vault account." : "Sign in to your encrypted vault."}</p>
-          <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
-          <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} /></label>
-          <button type="submit" disabled={loading}><KeyRound size={18} /> {authMode === "signup" ? "Sign up" : "Sign in"}</button>
-          <button type="button" className="secondary-button" onClick={() => setAuthMode(authMode === "signup" ? "signin" : "signup")}>
-            {authMode === "signup" ? "I already have an account" : "Create an account"}
-          </button>
-          <button type="button" className="secondary-button" onClick={() => { clearLocalSession(); setMessage("Local saved login cleared. Sign in again."); }}>
-            Reset saved login
-          </button>
-          {message && <span className="status">{message}</span>}
-        </form>
+        <section className="login-layout">
+          <aside className="login-panel login-intro">
+            <ShieldCheck size={34} />
+            <h1>AI Memory Vault</h1>
+            <p>Use one encrypted memory vault across the web dashboard and AI chat tools.</p>
+            <div className="install-card">
+              <strong>Use the browser extension</strong>
+              <p>Download the ZIP, unzip it, then load the `browser_extension` folder in Edge or Chrome.</p>
+              <a className="icon-button" href={extensionZipUrl} target="_blank" rel="noreferrer">
+                <Download size={18} /> Download extension ZIP
+              </a>
+            </div>
+            <ol className="install-steps">
+              <li>Open `edge://extensions` or `chrome://extensions`.</li>
+              <li>Enable Developer mode.</li>
+              <li>Select Load unpacked.</li>
+              <li>Choose the unzipped `browser_extension` folder.</li>
+              <li>Sign in with the same account and vault passphrase.</li>
+            </ol>
+            <a className="secondary-link" href={githubRepoUrl} target="_blank" rel="noreferrer">View project on GitHub</a>
+          </aside>
+
+          <form className="login-panel" onSubmit={submitAuth}>
+            {authMode === "signup" ? <UserPlus size={34} /> : <KeyRound size={34} />}
+            <h1>{authMode === "signup" ? "Create Account" : "Sign In"}</h1>
+            <p>{authMode === "signup" ? "Create your encrypted vault account." : "Sign in to your encrypted vault."}</p>
+            <label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
+            <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} /></label>
+            <button type="submit" disabled={loading}><KeyRound size={18} /> {authMode === "signup" ? "Sign up" : "Sign in"}</button>
+            <button type="button" className="secondary-button" onClick={() => setAuthMode(authMode === "signup" ? "signin" : "signup")}>
+              {authMode === "signup" ? "I already have an account" : "Create an account"}
+            </button>
+            <button type="button" className="secondary-button" onClick={() => { clearLocalSession(); setMessage("Local saved login cleared. Sign in again."); }}>
+              Reset saved login
+            </button>
+            {message && <span className="status">{message}</span>}
+          </form>
+        </section>
       </main>
     );
   }
