@@ -34,7 +34,7 @@ Current deployment:
 ```text
 https://ai-7pk.pages.dev/
 ``` 
->>>>>>> 33bcc3394b0240ce24769bf8ef3a7068eb81c23b
+
 
 Hosted stack:
 
