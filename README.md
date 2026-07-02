@@ -28,11 +28,7 @@ In hosted mode, memory content is encrypted in the browser before it is stored. 
 ## Hosted App
 
 Current deployment:
-<<<<<<< HEAD
 
-```text
-https://ai-7pk.pages.dev/
-```
 =======
 [Live Demo](https://ai-7pk.pages.dev/)
 ```text
