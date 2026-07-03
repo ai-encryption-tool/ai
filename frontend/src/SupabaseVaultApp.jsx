@@ -30,7 +30,7 @@ import { isSupabaseConfigured, supabase } from "./supabaseClient.js";
 const memoryTypes = ["project", "person", "preference", "skill", "goal", "decision", "fact", "note", "writing_style", "private_note"];
 const sources = ["manual", "chatgpt", "claude", "cursor", "browser_extension", "import_center", "api"];
 const githubRepoUrl = "https://github.com/ai-encryption-tool/ai";
-const extensionZipUrl = "https://github.com/ai-encryption-tool/ai/archive/refs/heads/main.zip";
+const extensionZipUrl = "/downloads/ai-memory-vault-extension-ready.zip";
 const supportUrl = "https://ko-fi.com/aimemoryvault";
 const supportTiers = [
   { label: "EUR5 Coffee", icon: Coffee, url: supportUrl },
