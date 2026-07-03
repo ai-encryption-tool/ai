@@ -55,10 +55,10 @@ See:
 AI Memory Vault is free to use. If it helps you, support the project:
 
 - [Star on GitHub](https://github.com/ai-encryption-tool/ai)
-- [Buy me a coffee](https://www.paypal.com/paypalme/RajendraDidel771)
-- [EUR5 Coffee](https://www.paypal.com/paypalme/RajendraDidel771/5)
-- [EUR20 Sponsor](https://www.paypal.com/paypalme/RajendraDidel771/20)
-- [EUR100 Company Sponsor](https://www.paypal.com/paypalme/RajendraDidel771/100)
+- [Buy me a coffee](https://ko-fi.com/aimemoryvault)
+- [EUR5 Coffee](https://ko-fi.com/aimemoryvault)
+- [EUR20 Sponsor](https://ko-fi.com/aimemoryvault)
+- [EUR100 Company Sponsor](https://ko-fi.com/aimemoryvault)
 
 ## What is included
 

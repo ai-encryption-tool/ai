@@ -31,11 +31,11 @@ const memoryTypes = ["project", "person", "preference", "skill", "goal", "decisi
 const sources = ["manual", "chatgpt", "claude", "cursor", "browser_extension", "import_center", "api"];
 const githubRepoUrl = "https://github.com/ai-encryption-tool/ai";
 const extensionZipUrl = "https://github.com/ai-encryption-tool/ai/archive/refs/heads/main.zip";
-const paypalMeUrl = "https://www.paypal.com/paypalme/RajendraDidel771";
+const supportUrl = "https://ko-fi.com/aimemoryvault";
 const supportTiers = [
-  { label: "EUR5 Coffee", icon: Coffee, url: `${paypalMeUrl}/5` },
-  { label: "EUR20 Sponsor", icon: Rocket, url: `${paypalMeUrl}/20` },
-  { label: "EUR100 Company Sponsor", icon: Trophy, url: `${paypalMeUrl}/100` },
+  { label: "EUR5 Coffee", icon: Coffee, url: supportUrl },
+  { label: "EUR20 Sponsor", icon: Rocket, url: supportUrl },
+  { label: "EUR100 Company Sponsor", icon: Trophy, url: supportUrl },
 ];
 const navItems = [
   ["overview", "Overview"],
@@ -467,7 +467,7 @@ export default function SupabaseVaultApp() {
                 <a href={githubRepoUrl} target="_blank" rel="noreferrer" onClick={() => setSupportOpen(false)}>
                   <Github size={16} /> Star on GitHub
                 </a>
-                <a href={paypalMeUrl} target="_blank" rel="noreferrer" onClick={() => setSupportOpen(false)}>
+                <a href={supportUrl} target="_blank" rel="noreferrer" onClick={() => setSupportOpen(false)}>
                   <Coffee size={16} /> Buy me a coffee
                 </a>
                 <div className="support-tiers">
