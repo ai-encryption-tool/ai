@@ -22,3 +22,5 @@ dist/
 server.log
 server.err
 *.log
+frontend/public/downloads/ai-memory-vault-extension-with-icon.zip
+frontend/public/downloads/ai-memory-vault-extension.zip
