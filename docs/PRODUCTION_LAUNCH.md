@@ -4,7 +4,7 @@ This project is now configured for self-service signup:
 
 - New Supabase users default to `approved`.
 - The web app uses Supabase Auth and client-side encryption.
-- The public repository keeps `browser_extension/config.js` blank. For your official packaged extension, fill it with your Supabase URL and publishable/anon key before zipping or store submission.
+- The approved Chrome Web Store extension includes the production Supabase publishable configuration, so normal users do not enter a Supabase URL or anon key.
 - Users only need email/password and their vault passphrase.
 
 ## 1. Supabase SQL
@@ -50,7 +50,7 @@ using (id = auth.uid());
 For public launch:
 
 1. Enable email/password signup.
-2. Keep email confirmation on if you want real email verification.
+2. Disable email confirmation if you want users to sign in immediately after signup.
 3. Add your deployed web URL to allowed redirect URLs.
 
 ## 3. Frontend Deploy
@@ -75,36 +75,21 @@ VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY
 
 ## 4. Extension Package
 
-The extension is configured in:
+The production Chrome extension is approved here:
 
 ```text
-browser_extension/config.js
+https://chromewebstore.google.com/detail/mhnjllipemabeoenghgbanpckhnbddcm?utm_source=item-share-cb
 ```
 
-For a public GitHub repo, leave the values blank so visitors do not get your project settings by mistake. If you publish your own extension package, add your Supabase URL and publishable/anon key before creating the zip. The publishable/anon key is not a service-role secret, but it is still project-specific.
-
-For local testing:
-
-1. Open `edge://extensions` or `chrome://extensions`.
-2. Enable Developer mode.
-3. Load unpacked.
-4. Select `browser_extension/`.
-
-For public release, upload `dist/ai-memory-vault-extension.zip` to:
-
-- Microsoft Edge Add-ons
-- Chrome Web Store
-
-You will need screenshots, icon assets, a short description, and a privacy policy.
+The packaged extension has the production Supabase URL and publishable/anon key built in. Users only need to sign in and enter their vault passphrase.
 
 ## 5. User Flow
 
 1. User opens web app or extension.
 2. User creates account.
-3. User confirms email if enabled.
-4. User signs in.
-5. User creates a vault passphrase.
-6. User saves memories.
-7. Memory content is encrypted before Supabase stores it.
+3. User signs in immediately.
+4. User creates a vault passphrase.
+5. User saves memories.
+6. Memory content is encrypted before Supabase stores it.
 
 If a user forgets the vault passphrase, nobody can recover their memory content.

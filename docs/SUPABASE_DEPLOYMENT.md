@@ -21,10 +21,10 @@ where email = 'you@example.com';
 In Supabase Authentication settings:
 
 1. Enable email/password signups.
-2. Keep email confirmation enabled if you want verified email addresses.
+2. Disable email confirmation for immediate self-service signup.
 3. Add your deployed site URL to allowed redirect URLs after deployment.
 
-New users start as `pending`. They can sign in, but cannot create or read memories until approved.
+New users default to `approved` through `supabase/schema.sql`, so they can use the vault immediately after signup.
 
 ## 3. Frontend Environment
 
@@ -62,17 +62,11 @@ Output directory: dist
 
 Add the same environment variables from step 3 in the hosting provider dashboard.
 
-## 6. Approve Users
+## 6. User Approval
 
-For now, approve users in Supabase SQL Editor:
+Manual approval is not required in production. The `profiles.status` default is `approved`.
 
-```sql
-update public.profiles
-set status = 'approved'
-where email = 'new-user@example.com';
-```
-
-Later we can add an encrypted admin page that lists pending users. Admins still cannot decrypt user memories because the memories are encrypted with each user's passphrase.
+Admins still cannot decrypt user memories because memory content is encrypted with each user's vault passphrase before storage.
 
 ## Privacy Notes
 

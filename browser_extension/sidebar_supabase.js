@@ -52,7 +52,7 @@ async function saveSettings() {
 function requireConfig() {
   const url = cleanSupabaseUrl();
   const anonKey = productionConfig.supabaseAnonKey || controls.supabaseAnonKey.value.trim();
-  if (!url || !anonKey) throw new Error("Add Supabase URL and anon key in Settings.");
+  if (!url || !anonKey) throw new Error("Extension is missing Supabase configuration. Reinstall the Chrome Web Store version or add Supabase URL and anon key in Settings.");
   return { url, anonKey };
 }
 
@@ -104,7 +104,7 @@ async function signUp() {
     headers: { Authorization: `Bearer ${anonKey}` },
     body: JSON.stringify({ email: controls.email.value.trim(), password: controls.password.value })
   });
-  statusEl.textContent = "Account created. Confirm your email if Supabase asks, then sign in.";
+  statusEl.textContent = "Account created. You can sign in now.";
 }
 
 async function signOut() {

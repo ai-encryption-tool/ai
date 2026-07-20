@@ -2,40 +2,39 @@
 
 The extension now uses the same hosted Supabase vault as the web app. It no longer needs the local FastAPI backend URL or API key.
 
-## 1. Reload the Extension
+## 1. Install the Extension
+
+The production extension is approved on the Chrome Web Store:
+
+```text
+https://chromewebstore.google.com/detail/mhnjllipemabeoenghgbanpckhnbddcm?utm_source=item-share-cb
+```
+
+Install it from Chrome Web Store for normal use.
+
+Developer fallback:
 
 1. Open `chrome://extensions` or `edge://extensions`.
 2. Enable Developer mode.
-3. Find **AI Memory Vault**.
-4. Click **Reload**.
-5. If it is not installed, click **Load unpacked** and choose `browser_extension/`.
+3. Click **Load unpacked**.
+4. Choose `browser_extension/`.
 
-## 2. Configure Supabase
+## 2. Supabase Configuration
 
-For public GitHub installs, open the extension and click **Settings**.
+Normal users do not need to enter a Supabase URL or anon key. The published extension already contains the production Supabase configuration.
 
-Fill:
+For self-hosted development, edit `browser_extension/config.js` before packaging:
 
 ```text
 Supabase URL: https://YOUR_PROJECT.supabase.co
 Supabase anon key: YOUR_SUPABASE_ANON_KEY
 ```
 
-These are the same values used by the web app in `frontend/.env.local`.
-
-For your own official packaged extension, you can set these values in `browser_extension/config.js` before packaging. When that file has real values, users will only need to sign in and enter their vault passphrase.
-
 ## 3. Sign In
 
 Use the same Supabase email/password account as the web app.
 
-The account must be approved in Supabase:
-
-```sql
-update public.profiles
-set status = 'approved'
-where email = 'user@example.com';
-```
+New users are approved automatically by the production database default. No manual approval is needed for normal signup.
 
 ## 4. Enter Vault Passphrase
 

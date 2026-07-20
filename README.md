@@ -253,9 +253,13 @@ More MCP client setup examples are in [`docs/MCP_SETUP.md`](docs/MCP_SETUP.md).
 
 ## Browser extension
 
-The browser extension is included in this repository in the `browser_extension/` folder.
+The browser extension is approved on the Chrome Web Store:
 
-Users can use it for free without waiting for a browser store release:
+[Install AI Memory Vault for Chrome](https://chromewebstore.google.com/detail/mhnjllipemabeoenghgbanpckhnbddcm?utm_source=item-share-cb)
+
+Normal users do not need a local backend, Supabase URL, or anon key. They install the extension, sign in with the same account used on `https://ai-memory-vault.com/`, and enter the same vault passphrase.
+
+GitHub ZIP fallback:
 
 1. Open the GitHub repository.
 2. Click **Code** -> **Download ZIP**.
@@ -283,19 +287,12 @@ Local unpacked install for developers:
    - Search Vault -> Select memories -> Insert context
    - Type a prompt -> Use Vault Context
 
-In hosted mode, the extension uses the Supabase project configured in `browser_extension/config.js`. Users sign in with their account and enter their vault passphrase. They do not need a local backend URL or API key.
-
-For this public repository, `browser_extension/config.js` is intentionally blank. Users can enter their own Supabase URL and publishable/anon key in extension Settings. For your official release package, fill `browser_extension/config.js` before creating the zip so users do not need to enter provider settings.
-
-For public users, publish the packaged extension through Microsoft Edge Add-ons or the Chrome Web Store.
-
-Until the extension is published in a browser store, the GitHub download + **Load unpacked** flow is the free installation path.
+In hosted mode, the extension uses the Supabase project configured in `browser_extension/config.js`. The published extension already includes the production project configuration, so users only need their account and vault passphrase.
 
 The extension does not scrape in the background and never auto-sends messages. It only captures or inserts text when the user clicks.
 
 Extension trust model:
 
-- Local backend only
 - No data sent to external LLM APIs
 - User previews before saving
 - Extension-created memories are pending unless auto-approve is explicitly enabled

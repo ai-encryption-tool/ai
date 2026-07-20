@@ -6,6 +6,7 @@ import {
   Coffee,
   Download,
   Edit3,
+  ExternalLink,
   FileUp,
   Github,
   HeartHandshake,
@@ -30,6 +31,7 @@ import { isSupabaseConfigured, supabase } from "./supabaseClient.js";
 const memoryTypes = ["project", "person", "preference", "skill", "goal", "decision", "fact", "note", "writing_style", "private_note"];
 const sources = ["manual", "chatgpt", "claude", "cursor", "browser_extension", "import_center", "api"];
 const githubRepoUrl = "https://github.com/ai-encryption-tool/ai";
+const chromeWebStoreUrl = "https://chromewebstore.google.com/detail/mhnjllipemabeoenghgbanpckhnbddcm?utm_source=item-share-cb";
 const extensionZipUrl = "/downloads/ai-memory-vault-extension-ready.zip";
 const supportUrl = "https://ko-fi.com/aimemoryvault";
 const supportTiers = [
@@ -187,7 +189,7 @@ export default function SupabaseVaultApp() {
     const { error } = await action;
     setLoading(false);
     if (error) setMessage(error.message);
-    else setMessage(authMode === "signup" ? "Account created. Check email if confirmation is enabled, then sign in." : "Signed in.");
+    else setMessage(authMode === "signup" ? "Account created. You can sign in now." : "Signed in.");
   }
 
   async function signOut() {
@@ -382,17 +384,22 @@ export default function SupabaseVaultApp() {
             <p>Use one encrypted memory vault across the web dashboard and AI chat tools.</p>
             <div className="install-card">
               <strong>Use the browser extension</strong>
-              <p>Download the ZIP, unzip it, then load the `browser_extension` folder in Edge or Chrome.</p>
-              <a className="icon-button" href={extensionZipUrl} target="_blank" rel="noreferrer">
-                <Download size={18} /> Download extension ZIP
-              </a>
+              <p>Install from the Chrome Web Store, then sign in with the same account and vault passphrase.</p>
+              <div className="install-actions">
+                <a className="icon-button" href={chromeWebStoreUrl} target="_blank" rel="noreferrer">
+                  <ExternalLink size={18} /> Install Chrome extension
+                </a>
+                <a className="secondary-button link-button" href={extensionZipUrl} target="_blank" rel="noreferrer">
+                  <Download size={18} /> Download ZIP
+                </a>
+              </div>
             </div>
             <ol className="install-steps">
-              <li>Open `edge://extensions` or `chrome://extensions`.</li>
-              <li>Enable Developer mode.</li>
-              <li>Select Load unpacked.</li>
-              <li>Choose the unzipped `browser_extension` folder.</li>
-              <li>Sign in with the same account and vault passphrase.</li>
+              <li>Create an account or sign in here.</li>
+              <li>Install the extension from Chrome Web Store.</li>
+              <li>Open ChatGPT, Claude, Gemini, or Copilot.</li>
+              <li>Click the AI Memory Vault extension.</li>
+              <li>Use the same account and vault passphrase.</li>
             </ol>
             <a className="secondary-link" href={githubRepoUrl} target="_blank" rel="noreferrer">View project on GitHub</a>
           </aside>
@@ -670,13 +677,17 @@ function ExtensionGuide() {
       <section className="panel">
         <h2>Chrome Extension</h2>
         <p>Use the extension with the same Supabase account and the same vault passphrase. Extension saves are encrypted before upload.</p>
+        <div className="inline-actions">
+          <a className="icon-button" href={chromeWebStoreUrl} target="_blank" rel="noreferrer"><ExternalLink size={18} /> Install from Chrome Web Store</a>
+          <a className="secondary-button link-button" href={githubRepoUrl} target="_blank" rel="noreferrer"><Github size={18} /> View GitHub</a>
+        </div>
       </section>
       <section className="panel">
         <h2>Use It</h2>
         <ol>
-          <li>Reload the unpacked extension.</li>
-          <li>Set Supabase URL and anon key.</li>
-          <li>Sign in with the same account.</li>
+          <li>Install AI Memory Vault from the Chrome Web Store.</li>
+          <li>Open a supported AI chat page.</li>
+          <li>Sign in with the same account you use here.</li>
           <li>Enter the same vault passphrase.</li>
           <li>Save memory or use vault context.</li>
         </ol>

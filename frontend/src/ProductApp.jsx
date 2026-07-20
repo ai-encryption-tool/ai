@@ -492,15 +492,15 @@ function ExtensionGuide({ status, onTest }) {
         <h2>Chrome Extension</h2>
         <p>The extension is now the main product surface: save memory from AI chats and insert Vault context into new prompts.</p>
         <button onClick={onTest}>Test backend connection</button>
+        <a className="icon-button" href="https://chromewebstore.google.com/detail/mhnjllipemabeoenghgbanpckhnbddcm?utm_source=item-share-cb" target="_blank" rel="noreferrer">Install from Chrome Web Store</a>
         {status && <p className="answer">{status}</p>}
       </section>
       <section className="panel">
-        <h2>Install Locally</h2>
+        <h2>Install</h2>
         <ol>
-          <li>Open <code>chrome://extensions</code>.</li>
-          <li>Enable Developer mode.</li>
-          <li>Click Load unpacked.</li>
-          <li>Select the <code>browser_extension</code> folder.</li>
+          <li>Install AI Memory Vault from the Chrome Web Store.</li>
+          <li>Sign in with the same account as the dashboard.</li>
+          <li>Use the same vault passphrase you use in the dashboard.</li>
           <li>Open ChatGPT, Claude, Gemini, or Copilot.</li>
         </ol>
       </section>
@@ -517,7 +517,7 @@ function ExtensionGuide({ status, onTest }) {
       </section>
       <section className="panel">
         <h2>Troubleshooting</h2>
-        <p>Backend URL should be <code>http://localhost:8000</code>. The extension does not auto-send messages. It only inserts context for you to review.</p>
+        <p>If the extension cannot connect, reinstall the Chrome Web Store version and sign in again. The extension does not auto-send messages. It only inserts context for you to review.</p>
       </section>
     </section>
   );
