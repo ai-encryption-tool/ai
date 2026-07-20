@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Memory Vault",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Save and use encrypted AI Memory Vault context inside AI chat tools.",
   "icons": {
     "16": "icons/icon16.png",
