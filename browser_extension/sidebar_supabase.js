@@ -5,6 +5,7 @@ const connectionDot = el("connectionDot");
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const productionConfig = globalThis.AI_MEMORY_VAULT_CONFIG || {};
+const directInsertLimit = 6000;
 
 const controls = {
   supabaseUrl: el("supabaseUrl"),
@@ -17,6 +18,7 @@ const controls = {
   autoApprove: el("autoApprove"),
   chatTitle: el("chatTitle"),
   chatPreview: el("chatPreview"),
+  contextHelp: el("contextHelp"),
   contextText: el("contextText"),
   suggestions: el("suggestions"),
   searchQuery: el("searchQuery"),
@@ -108,6 +110,23 @@ async function signUp() {
   });
   await signIn();
   statusEl.textContent = "Account created and signed in.";
+}
+
+async function resetPassword() {
+  await saveSettings();
+  const email = controls.email.value.trim();
+  if (!email) throw new Error("Enter your email first.");
+  const { anonKey } = requireConfig();
+  await supabaseFetch("/auth/v1/recover", {
+    auth: false,
+    method: "POST",
+    headers: { Authorization: `Bearer ${anonKey}` },
+    body: JSON.stringify({
+      email,
+      redirect_to: "https://ai-memory-vault.com/reset-password"
+    })
+  });
+  statusEl.textContent = "Password reset email sent. Open the link and set a new password.";
 }
 
 async function signOut() {
@@ -422,6 +441,38 @@ function renderSavedChats() {
   `).join("");
 }
 
+function showContextFallback(text, message = "Context is large, so copy it and paste it into the AI chat.") {
+  controls.contextText.value = text;
+  controls.contextHelp.textContent = message;
+  controls.contextHelp.classList.remove("hidden");
+  controls.contextText.classList.remove("hidden");
+  el("copyContext").classList.remove("hidden");
+}
+
+function hideContextFallback() {
+  controls.contextHelp.classList.add("hidden");
+  controls.contextText.classList.add("hidden");
+  el("copyContext").classList.add("hidden");
+}
+
+async function insertOrShowContext(text, shortStatus) {
+  if (text.length <= directInsertLimit) {
+    const response = await activeTabMessage({ type: "INSERT_PROMPT", text });
+    if (response?.ok) {
+      controls.contextText.value = "";
+      hideContextFallback();
+      statusEl.textContent = shortStatus;
+      return;
+    }
+    showContextFallback(text, response?.error || "Could not insert directly. Copy and paste the context instead.");
+    statusEl.textContent = response?.error || "Could not insert directly. Copy and paste the context instead.";
+    return;
+  }
+  showContextFallback(text);
+  await copyContextText();
+  statusEl.textContent = "Context is large, so it was copied. Paste it into the chat.";
+}
+
 async function renameSavedChat(index) {
   const memory = state.savedChats[index];
   if (!memory) return;
@@ -442,9 +493,10 @@ function selectSavedChat(index) {
   if (!memory) return;
   const exists = state.selected.some((item) => item.id === memory.id);
   if (!exists) state.selected = [memory, ...state.selected].slice(0, Number(controls.maxMemories.value || 5));
-  controls.contextText.value = formatContextFile(state.selected, "");
-  copyContextText().catch(() => {});
-  statusEl.textContent = "Saved chat selected and copied as vault context.";
+  insertOrShowContext(formatContextFile([memory], ""), "Saved chat inserted into the AI chat.").catch((error) => {
+    showContextFallback(formatContextFile([memory], ""), error.message || "Could not insert directly. Copy and paste the context instead.");
+    statusEl.textContent = error.message || "Could not insert directly. Copy and paste the context instead.";
+  });
 }
 
 function toggleSelected(memory) {
@@ -467,12 +519,6 @@ function renderResults() {
   }).join("");
 }
 
-async function findRelevantForPrompt() {
-  const promptResponse = await activeTabMessage({ type: "GET_PROMPT" });
-  if (!promptResponse?.ok || !promptResponse.text.trim()) throw new Error(promptResponse?.error || "Type a prompt first.");
-  await searchVault(promptResponse.text);
-}
-
 async function buildContextFromCurrentPrompt() {
   const promptResponse = await activeTabMessage({ type: "GET_PROMPT" });
   const originalPrompt = cleanPrompt(promptResponse?.text || "");
@@ -480,9 +526,7 @@ async function buildContextFromCurrentPrompt() {
   if (!state.results.length && !state.selected.length) await searchVault(originalPrompt);
   const selectedMemories = state.selected.slice(0, Number(controls.maxMemories.value || 5));
   if (!selectedMemories.length) throw new Error("Select at least one approved memory first.");
-  controls.contextText.value = formatContextFile(selectedMemories, originalPrompt);
-  await copyContextText();
-  statusEl.textContent = "Vault context copied. Paste it into the chat.";
+  await insertOrShowContext(formatContextFile(selectedMemories, originalPrompt), "Vault context inserted into the AI chat.");
 }
 
 function formatContextFile(memories, originalPrompt) {
@@ -547,6 +591,7 @@ el("showUseFlow").addEventListener("click", () => showFlow("use"));
 el("showSettingsFlow").addEventListener("click", () => showFlow("settings"));
 el("signIn").addEventListener("click", runSafely(signIn));
 el("signUp").addEventListener("click", runSafely(signUp));
+el("resetPassword").addEventListener("click", runSafely(resetPassword));
 el("signOut").addEventListener("click", runSafely(signOut));
 el("checkStatus").addEventListener("click", runSafely(checkStatus));
 el("extractChat").addEventListener("click", runSafely(extractChat));
@@ -554,7 +599,6 @@ el("saveFullChat").addEventListener("click", runSafely(saveFullChatTranscript));
 el("generateSuggestions").addEventListener("click", runSafely(generateSuggestions));
 el("loadSavedChats").addEventListener("click", runSafely(loadSavedChats));
 el("searchVault").addEventListener("click", runSafely(() => searchVault()));
-el("findRelevant").addEventListener("click", runSafely(findRelevantForPrompt));
 el("useVaultContext").addEventListener("click", runSafely(buildContextFromCurrentPrompt));
 el("copyContext").addEventListener("click", runSafely(copyContextText));
 

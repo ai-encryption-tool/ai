@@ -29,6 +29,7 @@
           <button id="signUp">Create account</button>
           <button id="signIn" class="secondary">Sign in</button>
         </div>
+        <button id="resetPassword" class="secondary">Forgot password?</button>
       </section>
 
       <section id="vaultPanel" class="panel hidden">
@@ -55,16 +56,15 @@
         <h2>Saved Chats</h2>
         <button id="loadSavedChats">Show saved chats</button>
         <div id="savedChats"></div>
+        <h2>Insert Context</h2>
+        <button id="useVaultContext">Use Vault Context</button>
+        <p id="contextHelp" class="meta hidden">Context is large, so copy it and paste it into the AI chat.</p>
+        <textarea id="contextText" class="hidden" placeholder="Generated context text appears here."></textarea>
+        <button id="copyContext" class="secondary hidden">Copy context text</button>
         <h2>Search Vault</h2>
         <input id="searchQuery" placeholder="Search approved memories" />
         <button id="searchVault">Search</button>
         <div id="searchResults"></div>
-        <h2>Insert Context</h2>
-        <button id="findRelevant">Find relevant memory for current prompt</button>
-        <button id="useVaultContext">Use Vault Context</button>
-        <p class="meta">Context text is generated here and copied. Paste it into the AI chat yourself.</p>
-        <textarea id="contextText" placeholder="Generated context text appears here."></textarea>
-        <button id="copyContext" class="secondary">Copy context text</button>
       </section>
 
       <section id="settingsFlow" class="panel hidden">

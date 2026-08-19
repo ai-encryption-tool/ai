@@ -259,6 +259,8 @@ The browser extension is approved on the Chrome Web Store:
 
 Normal users do not need a local backend, Supabase URL, or anon key. They install the extension, sign in with the same account used on `https://ai-memory-vault.com/`, and enter the same vault passphrase.
 
+Users can create an account in the extension. If they forget their login password, the extension can send a reset email; the reset link opens the web app to set a new password.
+
 GitHub ZIP fallback:
 
 1. Open the GitHub repository.

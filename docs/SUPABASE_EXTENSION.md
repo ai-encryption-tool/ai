@@ -36,6 +36,8 @@ Create an account or sign in directly from the extension. The web dashboard is o
 
 New users are approved automatically by the production database default. No manual approval is needed for normal signup.
 
+If a user forgets their login password, they can enter their email in the extension and click **Forgot password?**. The reset link opens the web app so they can set a new password.
+
 ## 4. Enter Vault Passphrase
 
 Use the same vault passphrase you use in the web app.
@@ -60,7 +62,8 @@ If **Auto-approve new memories** is off, the saved memory is pending and will no
 1. Open the extension.
 2. Click **Use Vault**.
 3. Click **Show saved chats**.
-4. Rename a chat or click **Use this chat** to copy it as vault context.
+4. Rename a chat or click **Use this chat**.
+5. Short context is inserted directly into the active AI chat. Large context reveals the copy box so the user can copy and paste it.
 
 ## 7. Use Vault
 

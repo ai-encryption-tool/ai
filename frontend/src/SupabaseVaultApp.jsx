@@ -88,6 +88,8 @@ export default function SupabaseVaultApp() {
   const [authMode, setAuthMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [passphrase, setPassphrase] = useState(sessionStorage.getItem("vaultPassphrase") || "");
   const [route, setRoute] = useState(window.location.pathname.replace("/", "") || "overview");
   const [form, setForm] = useState(blankForm());
@@ -138,7 +140,8 @@ export default function SupabaseVaultApp() {
       }
       setSession(data.session);
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === "PASSWORD_RECOVERY") setRecoveryMode(true);
       setSession(nextSession);
       setProfile(null);
       setMemories([]);
@@ -192,6 +195,35 @@ export default function SupabaseVaultApp() {
     setLoading(false);
     if (error) setMessage(error.message);
     else setMessage(authMode === "signup" ? "Account created. You can sign in now." : "Signed in.");
+  }
+
+  async function submitPasswordUpdate(event) {
+    event.preventDefault();
+    setLoading(true);
+    setMessage("");
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setLoading(false);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setNewPassword("");
+    setRecoveryMode(false);
+    setMessage("Password updated. Use the new password in the extension and website.");
+  }
+
+  async function sendPasswordReset() {
+    if (!email.trim()) {
+      setMessage("Enter your email first.");
+      return;
+    }
+    setLoading(true);
+    setMessage("");
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    setMessage(error ? error.message : "Password reset email sent.");
   }
 
   async function signOut() {
@@ -417,12 +449,30 @@ export default function SupabaseVaultApp() {
             <button type="button" className="secondary-button" onClick={() => setAuthMode(authMode === "signup" ? "signin" : "signup")}>
               {authMode === "signup" ? "I already have an account" : "Create an account"}
             </button>
+            <button type="button" className="secondary-button" onClick={sendPasswordReset} disabled={loading}>
+              Forgot password?
+            </button>
             <button type="button" className="secondary-button" onClick={() => { clearLocalSession(); setMessage("Local saved login cleared. Sign in again."); }}>
               Reset saved login
             </button>
             {message && <span className="status">{message}</span>}
           </form>
         </section>
+      </main>
+    );
+  }
+
+  if (recoveryMode) {
+    return (
+      <main className="login-screen">
+        <form className="login-panel" onSubmit={submitPasswordUpdate}>
+          <KeyRound size={34} />
+          <h1>Set New Password</h1>
+          <p>Enter a new login password for AI Memory Vault.</p>
+          <label>New password<input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} required minLength={8} /></label>
+          <button type="submit" disabled={loading}><KeyRound size={18} /> Update password</button>
+          {message && <span className="status">{message}</span>}
+        </form>
       </main>
     );
   }
