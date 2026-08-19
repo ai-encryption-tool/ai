@@ -282,7 +282,7 @@ Local unpacked install for developers:
 5. Open ChatGPT, Claude, Gemini, or Copilot.
 6. Click the extension.
 7. Use one of the core workflows:
-   - Preview current chat -> Save full chat transcript
+   - Preview current chat -> Rename chat -> Save chat
    - Preview current chat -> Generate memory suggestions -> Save pending or approved
    - Search Vault -> Select memories -> Insert context
    - Type a prompt -> Use Vault Context
@@ -295,8 +295,9 @@ Extension trust model:
 
 - No data sent to external LLM APIs
 - User previews before saving
+- Saved chats can be renamed in the extension
 - Extension-created memories are pending unless auto-approve is explicitly enabled
-- Full chat transcripts can be saved as one memory when conversation continuity matters
+- Full chats can be saved as one memory when conversation continuity matters
 
 Supported sites:
 

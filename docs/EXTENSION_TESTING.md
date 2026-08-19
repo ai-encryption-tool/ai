@@ -42,11 +42,12 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 2. Open the extension.
 3. Click `Preview current chat`.
 4. Review the preview.
-5. Click `Save full chat transcript` to store the whole visible conversation as one memory.
+5. Edit the chat name if needed.
+6. Click `Save chat` to store the whole visible conversation as one encrypted memory.
 6. Or click `Generate memory suggestions`.
 7. Edit/reject/save each suggestion.
 
-Full chat transcript memories are useful when you want continuity for a specific conversation. They can be long, so review what is inserted before sending.
+Saved chat memories are useful when you want continuity for a specific conversation. They can be renamed in the extension, and they can be long, so review what is inserted before sending.
 
 ## Known selector limitations
 

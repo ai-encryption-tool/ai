@@ -380,7 +380,7 @@ function MemoryList({ memories, onApprove, onEdit, onDelete, onSelect }) {
           <button className="unstyled" onClick={() => onSelect(memory)}>
             <p>{displayMemoryContent(memory)}</p>
           </button>
-          {isTranscript(memory) && <div className="keywords">Full chat transcript stored. Open detail to view/copy full text.</div>}
+          {isTranscript(memory) && <div className="keywords">Saved chat stored. Open detail to view/copy full text.</div>}
           <div className="meta">confidence {memory.confidence} · {memory.tags.join(", ") || "no tags"} · updated {new Date(memory.updated_at).toLocaleDateString()}</div>
           {memory.matching_keywords?.length > 0 && <div className="keywords">Why: {memory.matching_keywords.join(", ")}</div>}
           <div className="card-actions">
@@ -565,6 +565,10 @@ function isTranscript(memory) {
 
 function displayMemoryContent(memory) {
   if (!isTranscript(memory)) return memory.content;
-  const firstLine = memory.content.split("\n")[0] || "Full chat transcript";
-  return firstLine.replace(/^Full\s+/i, "").replace(/\s+chat transcript:\s*/i, " chat: ");
+  if (memory.title) return memory.title;
+  const firstLine = memory.content.split("\n")[0] || "Saved chat";
+  return firstLine
+    .replace(/^Full\s+\w+\s+chat transcript:\s*/i, "")
+    .replace(/^Saved chat:\s*/i, "")
+    .trim() || "Saved chat";
 }

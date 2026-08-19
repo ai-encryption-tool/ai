@@ -1,4 +1,4 @@
-const state = { suggestions: [], results: [], selected: [], session: null, profile: null };
+const state = { suggestions: [], results: [], selected: [], savedChats: [], session: null, profile: null };
 const el = (id) => document.getElementById(id);
 const statusEl = el("status");
 const connectionDot = el("connectionDot");
@@ -15,11 +15,13 @@ const controls = {
   maxMemories: el("maxMemories"),
   defaultSource: el("defaultSource"),
   autoApprove: el("autoApprove"),
+  chatTitle: el("chatTitle"),
   chatPreview: el("chatPreview"),
   contextText: el("contextText"),
   suggestions: el("suggestions"),
   searchQuery: el("searchQuery"),
   searchResults: el("searchResults"),
+  savedChats: el("savedChats"),
   authPanel: el("authPanel"),
   vaultPanel: el("vaultPanel"),
   accountStatus: el("accountStatus")
@@ -104,7 +106,8 @@ async function signUp() {
     headers: { Authorization: `Bearer ${anonKey}` },
     body: JSON.stringify({ email: controls.email.value.trim(), password: controls.password.value })
   });
-  statusEl.textContent = "Account created. You can sign in now.";
+  await signIn();
+  statusEl.textContent = "Account created and signed in.";
 }
 
 async function signOut() {
@@ -112,6 +115,7 @@ async function signOut() {
   state.profile = null;
   state.results = [];
   state.selected = [];
+  state.savedChats = [];
   await chrome.storage.local.remove(["supabaseSession"]);
   renderAuthState();
   statusEl.textContent = "Signed out.";
@@ -122,6 +126,7 @@ async function clearSavedSession(reason = "Saved login expired. Sign in again.")
   state.profile = null;
   state.results = [];
   state.selected = [];
+  state.savedChats = [];
   await chrome.storage.local.remove(["supabaseSession"]);
   renderAuthState();
   statusEl.textContent = reason;
@@ -166,7 +171,9 @@ async function checkStatus() {
     if (!state.session) {
       connectionDot.classList.remove("ok");
       renderAuthState();
-      statusEl.textContent = "Add Supabase settings and sign in.";
+      statusEl.textContent = productionConfig.supabaseUrl && productionConfig.supabaseAnonKey
+        ? "Create an account or sign in."
+        : "Add Supabase settings and sign in.";
       return;
     }
     const profile = await loadProfile();
@@ -243,6 +250,26 @@ async function insertEncryptedMemory(payload) {
   return rows?.[0];
 }
 
+async function updateEncryptedMemory(memory, patch) {
+  if (state.profile?.status !== "approved") throw new Error("Your account is not approved yet.");
+  const payload = {
+    type: memory.type,
+    content: memory.content,
+    source: memory.source,
+    confidence: memory.confidence,
+    approved: memory.approved,
+    tags: memory.tags || [],
+    title: memory.title,
+    ...patch
+  };
+  const rows = await supabaseFetch(`/rest/v1/memories?id=eq.${encodeURIComponent(memory.id)}&select=*`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify(await encryptJson(payload))
+  });
+  return rows?.[0] ? await decryptJson(rows[0]) : { ...memory, ...patch };
+}
+
 async function loadEncryptedMemories() {
   if (state.profile?.status !== "approved") throw new Error("Your account is not approved yet.");
   const rows = await supabaseFetch("/rest/v1/memories?select=*&order=updated_at.desc");
@@ -288,6 +315,7 @@ async function extractChat() {
   const response = await activeTabMessage({ type: "EXTRACT_CONVERSATION" });
   if (!response?.text) throw new Error("No visible chat text found. Reload the AI page and try again.");
   const countLine = response.message_count ? `Messages captured: ${response.message_count}` : "Messages captured: unknown";
+  if (!controls.chatTitle.value.trim()) controls.chatTitle.value = cleanChatTitle(response.title || "AI chat");
   controls.chatPreview.value = `${response.title}\n${response.url}\n${countLine}\n\n${response.text}`.trim();
   statusEl.textContent = `Preview ready. Captured ${response.message_count || "loaded"} message blocks.`;
 }
@@ -318,10 +346,12 @@ async function saveFullChatTranscript() {
   if (!controls.chatPreview.value.trim()) await extractChat();
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const source = sourceFromUrl(tab?.url || "");
-  const title = tab?.title || "AI chat transcript";
-  const content = [`Full ${source} chat transcript: ${title}`, `URL: ${tab?.url || "unknown"}`, "", controls.chatPreview.value].join("\n");
-  await insertEncryptedMemory({ type: "private_note", content, source, confidence: 0.9, approved: controls.autoApprove.checked, tags: ["full-chat", source, "transcript"] });
-  statusEl.textContent = controls.autoApprove.checked ? "Encrypted full chat saved and approved." : "Encrypted full chat saved as pending.";
+  const title = cleanChatTitle(controls.chatTitle.value || tab?.title || "AI chat transcript");
+  const content = [`Saved chat: ${title}`, `Source: ${source}`, `URL: ${tab?.url || "unknown"}`, "", controls.chatPreview.value].join("\n");
+  await insertEncryptedMemory({ type: "private_note", title, content, source, confidence: 0.9, approved: controls.autoApprove.checked, tags: ["full-chat", source, "transcript"] });
+  controls.chatTitle.value = "";
+  statusEl.textContent = controls.autoApprove.checked ? "Encrypted chat saved and approved." : "Encrypted chat saved as pending.";
+  await loadSavedChats();
 }
 
 async function saveSuggestion(index) {
@@ -368,6 +398,55 @@ async function searchVault(query = controls.searchQuery.value) {
   statusEl.textContent = `${state.results.length} approved encrypted memories found.`;
 }
 
+async function loadSavedChats() {
+  const all = await loadEncryptedMemories();
+  state.savedChats = all
+    .filter(isTranscript)
+    .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
+  renderSavedChats();
+  statusEl.textContent = `${state.savedChats.length} saved encrypted chats found.`;
+}
+
+function renderSavedChats() {
+  controls.savedChats.innerHTML = state.savedChats.map((memory, index) => `
+    <article class="memory">
+      <label>Chat name<input data-chat-title-index="${index}" value="${escapeHtml(displayMemoryTitle(memory))}" /></label>
+      <p>${escapeHtml(displayMemoryContent(memory))}</p>
+      <div class="row"><span class="pill">${memory.approved ? "approved" : "pending"}</span><span class="pill">${memory.source}</span></div>
+      <p class="meta">${escapeHtml((memory.tags || []).join(", "))}</p>
+      <div class="row">
+        <button data-rename-chat="${index}">Rename</button>
+        <button class="secondary" data-select-chat="${index}">Use this chat</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+async function renameSavedChat(index) {
+  const memory = state.savedChats[index];
+  if (!memory) return;
+  const input = document.querySelector(`[data-chat-title-index="${index}"]`);
+  const title = cleanChatTitle(input?.value || displayMemoryTitle(memory));
+  const content = replaceTranscriptTitle(memory.content, title);
+  const updated = await updateEncryptedMemory(memory, { title, content });
+  state.savedChats[index] = updated;
+  state.results = state.results.map((item) => item.id === updated.id ? updated : item);
+  state.selected = state.selected.map((item) => item.id === updated.id ? updated : item);
+  renderSavedChats();
+  renderResults();
+  statusEl.textContent = "Chat renamed.";
+}
+
+function selectSavedChat(index) {
+  const memory = state.savedChats[index];
+  if (!memory) return;
+  const exists = state.selected.some((item) => item.id === memory.id);
+  if (!exists) state.selected = [memory, ...state.selected].slice(0, Number(controls.maxMemories.value || 5));
+  controls.contextText.value = formatContextFile(state.selected, "");
+  copyContextText().catch(() => {});
+  statusEl.textContent = "Saved chat selected and copied as vault context.";
+}
+
 function toggleSelected(memory) {
   const exists = state.selected.some((item) => item.id === memory.id);
   state.selected = exists ? state.selected.filter((item) => item.id !== memory.id) : [...state.selected, memory];
@@ -408,7 +487,8 @@ async function buildContextFromCurrentPrompt() {
 
 function formatContextFile(memories, originalPrompt) {
   const sections = memories.map((memory, index) => [`## Memory ${index + 1}`, `Type: ${memory.type}`, `Source: ${memory.source}`, `Tags: ${(memory.tags || []).join(", ") || "none"}`, "", memory.content].join("\n"));
-  return ["AI Memory Vault Context", "This context was decrypted locally by the AI Memory Vault extension.", "", `Original prompt:\n${originalPrompt}`, "", sections.join("\n\n---\n\n")].join("\n");
+  const promptSection = originalPrompt ? [`Original prompt:\n${originalPrompt}`, ""] : [];
+  return ["AI Memory Vault Context", "This context was decrypted locally by the AI Memory Vault extension.", "", ...promptSection, sections.join("\n\n---\n\n")].join("\n");
 }
 
 function cleanPrompt(prompt) {
@@ -426,8 +506,34 @@ function escapeHtml(value) {
 }
 
 function displayMemoryContent(memory) {
-  if (!(memory.tags || []).includes("full-chat") && !(memory.tags || []).includes("transcript")) return memory.content;
-  return (memory.content || "").split("\n")[0] || "Full chat transcript";
+  if (!isTranscript(memory)) return memory.content;
+  return displayMemoryTitle(memory);
+}
+
+function displayMemoryTitle(memory) {
+  if (memory.title) return memory.title;
+  const firstLine = (memory.content || "").split("\n")[0] || "Saved chat";
+  return firstLine
+    .replace(/^Full\s+\w+\s+chat transcript:\s*/i, "")
+    .replace(/^Saved chat:\s*/i, "")
+    .trim() || "Saved chat";
+}
+
+function isTranscript(memory) {
+  return (memory.tags || []).includes("full-chat") || (memory.tags || []).includes("transcript");
+}
+
+function cleanChatTitle(title) {
+  return String(title || "Saved chat").replace(/\s+/g, " ").trim().slice(0, 120) || "Saved chat";
+}
+
+function replaceTranscriptTitle(content, title) {
+  const lines = String(content || "").split("\n");
+  if (/^(Full\s+\w+\s+chat transcript:|Saved chat:)/i.test(lines[0] || "")) {
+    lines[0] = `Saved chat: ${title}`;
+    return lines.join("\n");
+  }
+  return [`Saved chat: ${title}`, "", content].join("\n");
 }
 
 function showFlow(flow) {
@@ -446,6 +552,7 @@ el("checkStatus").addEventListener("click", runSafely(checkStatus));
 el("extractChat").addEventListener("click", runSafely(extractChat));
 el("saveFullChat").addEventListener("click", runSafely(saveFullChatTranscript));
 el("generateSuggestions").addEventListener("click", runSafely(generateSuggestions));
+el("loadSavedChats").addEventListener("click", runSafely(loadSavedChats));
 el("searchVault").addEventListener("click", runSafely(() => searchVault()));
 el("findRelevant").addEventListener("click", runSafely(findRelevantForPrompt));
 el("useVaultContext").addEventListener("click", runSafely(buildContextFromCurrentPrompt));
@@ -458,11 +565,15 @@ el("copyContext").addEventListener("click", runSafely(copyContextText));
 document.addEventListener("click", (event) => {
   const saveIndex = event.target?.dataset?.saveSuggestion;
   const rejectIndex = event.target?.dataset?.rejectSuggestion;
+  const renameChatIndex = event.target?.dataset?.renameChat;
+  const selectChatIndex = event.target?.dataset?.selectChat;
   if (saveIndex !== undefined) runSafely(() => saveSuggestion(Number(saveIndex)))();
   if (rejectIndex !== undefined) {
     state.suggestions.splice(Number(rejectIndex), 1);
     renderSuggestions();
   }
+  if (renameChatIndex !== undefined) runSafely(() => renameSavedChat(Number(renameChatIndex)))();
+  if (selectChatIndex !== undefined) selectSavedChat(Number(selectChatIndex));
 });
 
 document.addEventListener("change", (event) => {

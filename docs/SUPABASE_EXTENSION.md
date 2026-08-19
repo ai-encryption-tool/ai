@@ -32,7 +32,7 @@ Supabase anon key: YOUR_SUPABASE_ANON_KEY
 
 ## 3. Sign In
 
-Use the same Supabase email/password account as the web app.
+Create an account or sign in directly from the extension. The web dashboard is optional; the same email/password works in both places.
 
 New users are approved automatically by the production database default. No manual approval is needed for normal signup.
 
@@ -48,13 +48,21 @@ The passphrase never goes to Supabase. It is used locally by the extension to en
 2. Open the extension.
 3. Click **Save Memory**.
 4. Click **Preview current chat**.
-5. Choose either:
-   - **Save full chat transcript**
+5. Edit the **Chat name** if you want a clearer title.
+6. Choose either:
+   - **Save chat**
    - **Generate memory suggestions**, then save selected suggestions
 
 If **Auto-approve new memories** is off, the saved memory is pending and will not be used by search until approved.
 
-## 6. Use Vault
+## 6. Saved Chats
+
+1. Open the extension.
+2. Click **Use Vault**.
+3. Click **Show saved chats**.
+4. Rename a chat or click **Use this chat** to copy it as vault context.
+
+## 7. Use Vault
 
 1. Type a prompt in the AI chat box.
 2. Open the extension.

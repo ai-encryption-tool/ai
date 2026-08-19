@@ -21,12 +21,13 @@
       </section>
 
       <section id="authPanel" class="panel">
-        <h2>Sign in</h2>
+        <h2>Create account or sign in</h2>
+        <p class="meta">Use any email and password. The extension is the main app; the website is optional.</p>
         <label>Email<input id="email" type="email" placeholder="you@example.com" /></label>
-        <label>Password<input id="password" type="password" placeholder="Supabase password" /></label>
+        <label>Password<input id="password" type="password" placeholder="Type password" /></label>
         <div class="row">
-          <button id="signIn">Sign in</button>
-          <button id="signUp" class="secondary">Sign up</button>
+          <button id="signUp">Create account</button>
+          <button id="signIn" class="secondary">Sign in</button>
         </div>
       </section>
 
@@ -42,14 +43,18 @@
       <section id="saveFlow" class="panel flow-panel hidden">
         <h2>Save Chat</h2>
         <button id="extractChat">Preview current chat</button>
+        <label>Chat name<input id="chatTitle" placeholder="Example: Project planning chat" /></label>
         <textarea id="chatPreview" placeholder="Conversation preview appears here before anything is sent."></textarea>
-        <button id="saveFullChat">Save full chat transcript</button>
+        <button id="saveFullChat">Save chat</button>
         <button id="generateSuggestions">Generate memory suggestions</button>
         <h2>Suggested Memories</h2>
         <div id="suggestions"></div>
       </section>
 
       <section id="useFlow" class="panel flow-panel hidden">
+        <h2>Saved Chats</h2>
+        <button id="loadSavedChats">Show saved chats</button>
+        <div id="savedChats"></div>
         <h2>Search Vault</h2>
         <input id="searchQuery" placeholder="Search approved memories" />
         <button id="searchVault">Search</button>

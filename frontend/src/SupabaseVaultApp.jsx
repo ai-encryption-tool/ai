@@ -54,6 +54,7 @@ function blankForm() {
 function toPayload(form) {
   return {
     type: form.type,
+    title: form.title,
     content: form.content,
     source: form.source,
     confidence: Number(form.confidence),
@@ -111,6 +112,7 @@ export default function SupabaseVaultApp() {
       if (tagFilter && !(memory.tags || []).some((tag) => tag.toLowerCase().includes(tagFilter.toLowerCase()))) return false;
       if (!needle) return true;
       return [
+      memory.title,
       memory.content,
       memory.type,
       memory.source,
@@ -334,6 +336,7 @@ export default function SupabaseVaultApp() {
       setLoading(true);
       const payload = {
         type: memory.type,
+        title: memory.title,
         content: memory.content,
         source: memory.source,
         confidence: memory.confidence,
@@ -698,5 +701,9 @@ function ExtensionGuide() {
 
 function displayMemoryContent(memory) {
   if (!(memory.tags || []).includes("full-chat") && !(memory.tags || []).includes("transcript")) return memory.content;
-  return (memory.content || "").split("\n")[0] || "Full chat transcript";
+  if (memory.title) return memory.title;
+  return ((memory.content || "").split("\n")[0] || "Saved chat")
+    .replace(/^Full\s+\w+\s+chat transcript:\s*/i, "")
+    .replace(/^Saved chat:\s*/i, "")
+    .trim() || "Saved chat";
 }
