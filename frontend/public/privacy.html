@@ -54,53 +54,99 @@
     <main>
       <section>
         <h1>AI Memory Vault Privacy Policy</h1>
-        <p>Effective date: July 3, 2026</p>
+        <p>Effective date: August 20, 2026</p>
 
         <h2>Overview</h2>
         <p>
-          AI Memory Vault helps users save and reuse encrypted memory notes from AI chat pages.
-          The extension and web app are designed so memory content is encrypted before it is stored.
+          AI Memory Vault is a browser extension and web dashboard that helps users save, rename, search,
+          and reuse encrypted memory notes and saved AI chat context. This policy explains what user data
+          is collected, how it is used, where it is stored, and which parties receive it.
         </p>
 
-        <h2>Data We Collect</h2>
-        <p>AI Memory Vault may process the following user data to provide its core features:</p>
+        <h2>Data Collected Or Processed</h2>
+        <p>AI Memory Vault collects or processes the following user data only when needed for the product's core features:</p>
         <ul>
-          <li>Email address for account sign-in.</li>
-          <li>Authentication information required to sign in to the user's vault account.</li>
-          <li>Vault passphrase entered by the user. The passphrase is used locally for encryption and decryption.</li>
-          <li>AI chat text or selected page content when the user chooses to preview, save, or reuse memory context.</li>
-          <li>Extension settings, such as saved account/session state and preferred vault settings.</li>
+          <li><strong>Account information:</strong> email address and authentication session data used for sign-up, sign-in, and password reset.</li>
+          <li><strong>Authentication information:</strong> the login password is sent to Supabase Auth over HTTPS for authentication. AI Memory Vault does not store the login password.</li>
+          <li><strong>Vault passphrase:</strong> the passphrase entered by the user is used locally in the browser to encrypt and decrypt memory content. It is not sent to Supabase or to the developer. The extension may store it locally on the user's device so the user does not need to retype it every time.</li>
+          <li><strong>Website content and personal communications:</strong> AI chat page text, conversation previews, saved chat names, selected memory notes, and prompt/context text are processed only after the user clicks extension actions such as Preview current chat, Save chat, Search, Use this chat, or Use Vault Context.</li>
+          <li><strong>User-generated content:</strong> manually entered memory notes, tags, confidence values, approval status, imported text, and saved chat titles.</li>
+          <li><strong>Extension settings:</strong> saved email address, Supabase project settings for self-hosted use, max memory count, default source, auto-approve preference, and local session state.</li>
+          <li><strong>Technical metadata:</strong> encrypted memory row IDs, user ID, timestamps, encryption version, initialization vector, and salt needed to store and retrieve encrypted memories.</li>
         </ul>
 
         <h2>How Data Is Used</h2>
         <p>
-          User data is used only to provide AI Memory Vault's single purpose: saving encrypted
-          memory notes from AI chat pages and retrieving approved memories back into supported AI chat pages.
+          User data is used only for AI Memory Vault's single purpose: allowing a user to save encrypted
+          AI chat memories and reuse selected vault context in supported AI chat tools. Data is used to:
+        </p>
+        <ul>
+          <li>Create and authenticate the user's account.</li>
+          <li>Send password reset emails when the user clicks Forgot password.</li>
+          <li>Preview chat content selected by the user.</li>
+          <li>Encrypt memory content before storage.</li>
+          <li>Download and decrypt the user's own memories after the user enters the vault passphrase.</li>
+          <li>Search decrypted memories locally in the browser.</li>
+          <li>Insert or copy selected context into the active AI chat page when the user requests it.</li>
+        </ul>
+
+        <h2>Storage And Encryption</h2>
+        <p>
+          Memory content is encrypted in the user's browser before it is uploaded for hosted storage.
+          Hosted memory content is stored in Supabase as ciphertext with the related IV, salt, and version.
+          Supabase also stores account data needed for authentication and row-level access control.
+        </p>
+        <p>
+          The vault passphrase is not sent to Supabase or to the developer. If a user forgets the vault
+          passphrase, encrypted memory content cannot be recovered. Extension settings and local session
+          data may be stored using Chrome extension storage on the user's device or browser profile.
         </p>
 
-        <h2>Encryption</h2>
+        <h2>Data Sharing And Third Parties</h2>
         <p>
-          Memory content is encrypted in the user's browser before storage. The vault passphrase is not
-          sent to Supabase or to the extension developer. If a user forgets the vault passphrase,
-          encrypted memory content cannot be recovered.
+          AI Memory Vault does not sell user data and does not use user data for advertising, tracking,
+          creditworthiness, or lending decisions. User data is shared only as needed to provide the product:
         </p>
-
-        <h2>Data Sharing</h2>
+        <ul>
+          <li><strong>Supabase:</strong> receives email address, authentication requests, session data, password reset requests, profile rows, and encrypted memory rows for the hosted vault service.</li>
+          <li><strong>Chrome/Browser storage:</strong> stores extension settings, local session state, and locally saved vault passphrase on the user's device or browser profile.</li>
+          <li><strong>Supported AI chat websites:</strong> when the user clicks Use this chat or Use Vault Context, selected decrypted context may be inserted into the active chat input on sites such as ChatGPT, Claude, Gemini, or Copilot. If the user sends that prompt, the AI chat provider receives it under that provider's own terms and privacy policy.</li>
+        </ul>
         <p>
-          AI Memory Vault does not sell user data. User data is not transferred to third parties for
-          advertising, unrelated purposes, creditworthiness, or lending decisions.
-        </p>
-
-        <h2>Third-Party Services</h2>
-        <p>
-          The hosted version uses Supabase for authentication and encrypted database storage.
-          Supabase stores account data and encrypted vault rows needed to run the service.
+          AI Memory Vault does not send saved memory content to external LLM APIs by itself. The extension
+          does not run background scraping. Chat content is processed only when the user opens the extension
+          and chooses an action.
         </p>
 
         <h2>User Control</h2>
         <p>
-          Users choose when to preview chat content, save memories, approve memories, search memories,
-          export decrypted memories, or delete saved memories.
+          Users choose when to preview chat content, save chats, rename saved chats, save memory suggestions,
+          search memories, insert context, export decrypted memories, or delete saved memories. Users may
+          delete saved memories from the product. Password reset emails are sent only when the user requests
+          them through Forgot password.
+        </p>
+
+        <h2>Retention</h2>
+        <p>
+          Account data and encrypted memory rows are retained while the user keeps an account and saved
+          memories. Deleted memory rows are removed from the active Supabase database. Local extension data
+          remains on the user's device/browser profile until the user signs out, clears extension data, or
+          removes the extension.
+        </p>
+
+        <h2>Security</h2>
+        <p>
+          Data transmitted between the extension, web app, and Supabase uses HTTPS. Memory content is
+          encrypted client-side before hosted storage. Access to hosted rows is restricted by Supabase
+          Row Level Security so users can access only their own rows.
+        </p>
+
+        <h2>Limited Use Commitments</h2>
+        <p>
+          AI Memory Vault does not transfer user data for unrelated purposes. It does not use or transfer
+          user data for personalized advertising, retargeting, interest-based advertising, creditworthiness,
+          or lending. Human access to user memory content is not possible without the user's vault passphrase,
+          except where required by law or where the user intentionally shares decrypted content for support.
         </p>
 
         <h2>Contact</h2>

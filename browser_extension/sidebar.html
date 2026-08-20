@@ -43,6 +43,7 @@
 
       <section id="saveFlow" class="panel flow-panel hidden">
         <h2>Save Chat</h2>
+        <p class="meta">Chat text is read only when you preview or save. Saved content is encrypted locally before storage.</p>
         <button id="extractChat">Preview current chat</button>
         <label>Chat name<input id="chatTitle" placeholder="Example: Project planning chat" /></label>
         <textarea id="chatPreview" placeholder="Conversation preview appears here before anything is sent."></textarea>
@@ -54,6 +55,7 @@
 
       <section id="useFlow" class="panel flow-panel hidden">
         <h2>Saved Chats</h2>
+        <p class="meta">Selected context is decrypted locally and inserted only when you click a Use button.</p>
         <button id="loadSavedChats">Show saved chats</button>
         <div id="savedChats"></div>
         <h2>Insert Context</h2>
