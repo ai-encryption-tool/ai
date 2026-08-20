@@ -154,6 +154,34 @@ button.secondary {
   width: auto;
 }
 
+.chat-list {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.chat-row {
+  align-items: center;
+  border: 1px solid #e0e6df;
+  border-radius: 8px;
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  padding: 0.4rem;
+}
+
+.chat-title-input {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-button {
+  padding: 0.48rem 0.55rem;
+  white-space: nowrap;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;

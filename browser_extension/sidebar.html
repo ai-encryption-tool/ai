@@ -22,7 +22,6 @@
 
       <section id="authPanel" class="panel">
         <h2>Create account or sign in</h2>
-        <p class="meta">Use any email and password. The extension is the main app; the website is optional.</p>
         <label>Email<input id="email" type="email" placeholder="you@example.com" /></label>
         <label>Password<input id="password" type="password" placeholder="Type password" /></label>
         <div class="row">
@@ -54,25 +53,24 @@
       </section>
 
       <section id="useFlow" class="panel flow-panel hidden">
-        <h2>Saved Chats</h2>
-        <p class="meta">Selected context is decrypted locally and inserted only when you click a Use button.</p>
-        <button id="loadSavedChats">Show saved chats</button>
-        <div id="savedChats"></div>
+        <h2>Search Vault</h2>
+        <input id="searchQuery" placeholder="Search approved memories" />
+        <button id="searchVault">Search</button>
+        <div id="searchResults"></div>
         <h2>Insert Context</h2>
         <button id="useVaultContext">Use Vault Context</button>
         <p id="contextHelp" class="meta hidden">Context is large, so copy it and paste it into the AI chat.</p>
         <textarea id="contextText" class="hidden" placeholder="Generated context text appears here."></textarea>
         <button id="copyContext" class="secondary hidden">Copy context text</button>
-        <h2>Search Vault</h2>
-        <input id="searchQuery" placeholder="Search approved memories" />
-        <button id="searchVault">Search</button>
-        <div id="searchResults"></div>
+        <h2>Saved Chats</h2>
+        <button id="loadSavedChats" class="secondary">Show saved chats</button>
+        <div id="savedChats"></div>
       </section>
 
       <section id="settingsFlow" class="panel hidden">
         <h2>Options</h2>
-        <label class="provider-setting">Supabase URL<input id="supabaseUrl" placeholder="https://YOUR_PROJECT.supabase.co" /></label>
-        <label class="provider-setting">Supabase anon key<input id="supabaseAnonKey" placeholder="ey..." /></label>
+        <label class="provider-setting">Vault service URL<input id="supabaseUrl" placeholder="https://vault.example.com" /></label>
+        <label class="provider-setting">Vault service key<input id="supabaseAnonKey" placeholder="key" /></label>
         <label>Max memories<input id="maxMemories" type="number" min="1" max="10" value="5" /></label>
         <label>Default source
           <select id="defaultSource">

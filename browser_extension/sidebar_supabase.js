@@ -6,6 +6,7 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const productionConfig = globalThis.AI_MEMORY_VAULT_CONFIG || {};
 const directInsertLimit = 6000;
+const savedChatDisplayLimit = 20;
 
 const controls = {
   supabaseUrl: el("supabaseUrl"),
@@ -56,7 +57,7 @@ async function saveSettings() {
 function requireConfig() {
   const url = cleanSupabaseUrl();
   const anonKey = productionConfig.supabaseAnonKey || controls.supabaseAnonKey.value.trim();
-  if (!url || !anonKey) throw new Error("Extension is missing Supabase configuration. Reinstall the Chrome Web Store version or add Supabase URL and anon key in Settings.");
+  if (!url || !anonKey) throw new Error("Extension is missing vault service configuration. Reinstall the Chrome Web Store version or add vault service settings.");
   return { url, anonKey };
 }
 
@@ -81,7 +82,7 @@ async function supabaseFetch(path, options = {}) {
   const response = await fetch(`${url}${path}`, { ...options, headers });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.msg || body.message || body.error_description || `Supabase ${response.status}`);
+    throw new Error(body.msg || body.message || body.error_description || `Vault service ${response.status}`);
   }
   return response.status === 204 ? null : response.json();
 }
@@ -192,7 +193,7 @@ async function checkStatus() {
       renderAuthState();
       statusEl.textContent = productionConfig.supabaseUrl && productionConfig.supabaseAnonKey
         ? "Create an account or sign in."
-        : "Add Supabase settings and sign in.";
+        : "Add vault service settings and sign in.";
       return;
     }
     const profile = await loadProfile();
@@ -412,9 +413,9 @@ async function searchVault(query = controls.searchQuery.value) {
     .filter((memory) => !query.trim() || memory.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, Number(controls.maxMemories.value || 5));
-  state.selected = state.results.slice(0, Number(controls.maxMemories.value || 5));
+  state.selected = [];
   renderResults();
-  statusEl.textContent = `${state.results.length} approved encrypted memories found.`;
+  statusEl.textContent = `${state.results.length} approved encrypted memories found. Select the ones you want to use.`;
 }
 
 async function loadSavedChats() {
@@ -427,18 +428,22 @@ async function loadSavedChats() {
 }
 
 function renderSavedChats() {
-  controls.savedChats.innerHTML = state.savedChats.map((memory, index) => `
-    <article class="memory">
-      <label>Chat name<input data-chat-title-index="${index}" value="${escapeHtml(displayMemoryTitle(memory))}" /></label>
-      <p>${escapeHtml(displayMemoryContent(memory))}</p>
-      <div class="row"><span class="pill">${memory.approved ? "approved" : "pending"}</span><span class="pill">${memory.source}</span></div>
-      <p class="meta">${escapeHtml((memory.tags || []).join(", "))}</p>
-      <div class="row">
-        <button data-rename-chat="${index}">Rename</button>
-        <button class="secondary" data-select-chat="${index}">Use this chat</button>
-      </div>
-    </article>
-  `).join("");
+  const visible = state.savedChats.slice(0, savedChatDisplayLimit);
+  const footer = state.savedChats.length > savedChatDisplayLimit
+    ? `<p class="meta">Showing latest ${savedChatDisplayLimit} of ${state.savedChats.length} saved chats.</p>`
+    : "";
+  controls.savedChats.innerHTML = `
+    <div class="chat-list">
+      ${visible.map((memory, index) => `
+        <article class="chat-row">
+          <input class="chat-title-input" data-chat-title-index="${index}" value="${escapeHtml(displayMemoryTitle(memory))}" aria-label="Chat name" />
+          <button class="secondary compact-button" data-rename-chat="${index}">Rename</button>
+          <button class="compact-button" data-select-chat="${index}">Use</button>
+        </article>
+      `).join("")}
+    </div>
+    ${footer}
+  `;
 }
 
 function showContextFallback(text, message = "Context is large, so copy it and paste it into the AI chat.") {
@@ -525,7 +530,7 @@ async function buildContextFromCurrentPrompt() {
   if (!originalPrompt) throw new Error("Type a prompt first.");
   if (!state.results.length && !state.selected.length) await searchVault(originalPrompt);
   const selectedMemories = state.selected.slice(0, Number(controls.maxMemories.value || 5));
-  if (!selectedMemories.length) throw new Error("Select at least one approved memory first.");
+  if (!selectedMemories.length) throw new Error("Select at least one memory first.");
   await insertOrShowContext(formatContextFile(selectedMemories, originalPrompt), "Vault context inserted into the AI chat.");
 }
 
