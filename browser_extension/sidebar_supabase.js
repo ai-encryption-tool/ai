@@ -1,4 +1,12 @@
-const state = { suggestions: [], results: [], selected: [], savedChats: [], session: null, profile: null };
+const state = {
+  suggestions: [],
+  results: [],
+  selected: [],
+  savedChats: [],
+  session: null,
+  profile: null,
+  decryptStats: { total: 0, opened: 0, skipped: 0 }
+};
 const el = (id) => document.getElementById(id);
 const statusEl = el("status");
 const connectionDot = el("connectionDot");
@@ -261,7 +269,7 @@ async function decryptJson(row) {
 }
 
 async function insertEncryptedMemory(payload) {
-  if (state.profile?.status !== "approved") throw new Error("Your account is not approved yet.");
+  if (state.profile?.status !== "approved") throw new Error("Account is not active.");
   const rows = await supabaseFetch("/rest/v1/memories?select=*", {
     method: "POST",
     headers: { Prefer: "return=representation" },
@@ -271,7 +279,7 @@ async function insertEncryptedMemory(payload) {
 }
 
 async function updateEncryptedMemory(memory, patch) {
-  if (state.profile?.status !== "approved") throw new Error("Your account is not approved yet.");
+  if (state.profile?.status !== "approved") throw new Error("Account is not active.");
   const payload = {
     type: memory.type,
     content: memory.content,
@@ -291,10 +299,18 @@ async function updateEncryptedMemory(memory, patch) {
 }
 
 async function loadEncryptedMemories() {
-  if (state.profile?.status !== "approved") throw new Error("Your account is not approved yet.");
+  if (state.profile?.status !== "approved") throw new Error("Account is not active.");
   const rows = await supabaseFetch("/rest/v1/memories?select=*&order=updated_at.desc");
   const memories = [];
-  for (const row of rows || []) memories.push(await decryptJson(row));
+  let skipped = 0;
+  for (const row of rows || []) {
+    try {
+      memories.push(await decryptJson(row));
+    } catch (_error) {
+      skipped += 1;
+    }
+  }
+  state.decryptStats = { total: rows?.length || 0, opened: memories.length, skipped };
   return memories;
 }
 
@@ -325,7 +341,7 @@ function runSafely(fn) {
       if (state.session) await refreshSessionIfNeeded();
       await fn(...args);
     } catch (error) {
-      statusEl.textContent = error.message || "Something went wrong.";
+      statusEl.textContent = friendlyError(error);
     }
   };
 }
@@ -416,7 +432,7 @@ async function searchVault(query = controls.searchQuery.value) {
   state.selected = [];
   renderResults();
   hideContextFallback();
-  statusEl.textContent = `${state.results.length} memories found.`;
+  statusEl.textContent = `${state.results.length} memories found for this secret code.${secretCodeSkipNote()}`;
 }
 
 async function loadSavedChats() {
@@ -425,7 +441,7 @@ async function loadSavedChats() {
     .filter(isTranscript)
     .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
   renderSavedChats();
-  statusEl.textContent = `${state.savedChats.length} saved encrypted chats found.`;
+  statusEl.textContent = `${state.savedChats.length} saved chats found for this secret code.${secretCodeSkipNote()}`;
 }
 
 function renderSavedChats() {
@@ -574,6 +590,17 @@ function shortAccountLabel(email) {
   return `${name.slice(0, 12)}...@${domain}`;
 }
 
+function secretCodeSkipNote() {
+  return state.decryptStats.skipped ? ` ${state.decryptStats.skipped} item${state.decryptStats.skipped === 1 ? "" : "s"} use another secret code.` : "";
+}
+
+function friendlyError(error) {
+  const message = String(error?.message || "").trim();
+  if (message) return message;
+  if (error?.name) return `${error.name}. Check login and secret code.`;
+  return "Action failed. Check login and secret code.";
+}
+
 function cleanChatTitle(title) {
   return String(title || "Saved chat").replace(/\s+/g, " ").trim().slice(0, 120) || "Saved chat";
 }
@@ -621,6 +648,17 @@ el("copyContext").addEventListener("click", runSafely(copyContextText));
 
 ["supabaseUrl", "supabaseAnonKey", "email", "passphrase", "maxMemories", "defaultSource", "autoApprove"].forEach((id) => {
   controls[id].addEventListener("change", () => saveSettings());
+});
+
+controls.passphrase.addEventListener("input", () => {
+  state.results = [];
+  state.selected = [];
+  state.savedChats = [];
+  renderResults();
+  renderSavedChats();
+  hideContextFallback();
+  saveSettings();
+  statusEl.textContent = "Secret code changed. Search or open saved chats.";
 });
 
 document.addEventListener("click", (event) => {
