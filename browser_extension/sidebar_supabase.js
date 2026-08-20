@@ -67,7 +67,7 @@ function requireSession() {
 }
 
 function requirePassphrase() {
-  if (!controls.passphrase.value) throw new Error("Enter your vault passphrase.");
+  if (!controls.passphrase.value) throw new Error("Enter your secret code.");
   return controls.passphrase.value;
 }
 
@@ -180,7 +180,7 @@ function renderAuthState() {
   controls.authPanel.classList.toggle("hidden", signedIn);
   controls.vaultPanel.classList.toggle("hidden", !signedIn);
   controls.accountStatus.textContent = signedIn
-    ? `${controls.email.value || "Signed in"} | ${state.profile?.status || "pending"}`
+    ? `${shortAccountLabel(controls.email.value)} | ${state.profile?.status || "pending"}`
     : "Not signed in";
 }
 
@@ -200,7 +200,7 @@ async function checkStatus() {
     renderAuthState();
     if (profile?.status === "approved") {
       connectionDot.classList.add("ok");
-      statusEl.textContent = "Vault connected. Use the same passphrase as the web app.";
+      statusEl.textContent = "Vault connected.";
     } else {
       connectionDot.classList.remove("ok");
       statusEl.textContent = `Signed in, but this account is not active. Status: ${profile?.status || "pending"}.`;
@@ -415,7 +415,8 @@ async function searchVault(query = controls.searchQuery.value) {
     .slice(0, Number(controls.maxMemories.value || 5));
   state.selected = [];
   renderResults();
-  statusEl.textContent = `${state.results.length} approved encrypted memories found. Select the ones you want to use.`;
+  hideContextFallback();
+  statusEl.textContent = `${state.results.length} memories found.`;
 }
 
 async function loadSavedChats() {
@@ -444,6 +445,12 @@ function renderSavedChats() {
     </div>
     ${footer}
   `;
+}
+
+async function useSearchResult(index) {
+  const memory = state.results[index];
+  if (!memory) return;
+  await insertOrShowContext(formatContextFile([memory], ""), "Memory inserted into the AI chat.");
 }
 
 function showContextFallback(text, message = "Context is large, so copy it and paste it into the AI chat.") {
@@ -504,34 +511,16 @@ function selectSavedChat(index) {
   });
 }
 
-function toggleSelected(memory) {
-  const exists = state.selected.some((item) => item.id === memory.id);
-  state.selected = exists ? state.selected.filter((item) => item.id !== memory.id) : [...state.selected, memory];
-  renderResults();
-}
-
 function renderResults() {
-  controls.searchResults.innerHTML = state.results.map((memory, index) => {
-    const checked = state.selected.some((item) => item.id === memory.id) ? "checked" : "";
-    return `
-      <article class="memory">
-        <label class="memory-select"><input type="checkbox" data-result-index="${index}" ${checked} /><span>Use this memory</span></label>
-        <p>${escapeHtml(displayMemoryContent(memory))}</p>
-        <div class="row"><span class="pill">${memory.type}</span><span class="pill">${memory.source}</span><span class="pill">score ${Number(memory.score || 0).toFixed(2)}</span></div>
-        <p class="meta">${escapeHtml((memory.tags || []).join(", "))}</p>
-      </article>
-    `;
-  }).join("");
-}
-
-async function buildContextFromCurrentPrompt() {
-  const promptResponse = await activeTabMessage({ type: "GET_PROMPT" });
-  const originalPrompt = cleanPrompt(promptResponse?.text || "");
-  if (!originalPrompt) throw new Error("Type a prompt first.");
-  if (!state.results.length && !state.selected.length) await searchVault(originalPrompt);
-  const selectedMemories = state.selected.slice(0, Number(controls.maxMemories.value || 5));
-  if (!selectedMemories.length) throw new Error("Select at least one memory first.");
-  await insertOrShowContext(formatContextFile(selectedMemories, originalPrompt), "Vault context inserted into the AI chat.");
+  controls.searchResults.innerHTML = state.results.map((memory, index) => `
+    <article class="result-row">
+      <div class="result-text">
+        <strong>${escapeHtml(displayMemoryContent(memory))}</strong>
+        <span>${escapeHtml(compactMeta(memory))}</span>
+      </div>
+      <button class="compact-button" data-use-result-index="${index}">Use</button>
+    </article>
+  `).join("");
 }
 
 function formatContextFile(memories, originalPrompt) {
@@ -572,6 +561,19 @@ function isTranscript(memory) {
   return (memory.tags || []).includes("full-chat") || (memory.tags || []).includes("transcript");
 }
 
+function compactMeta(memory) {
+  const tags = (memory.tags || []).filter((tag) => !["full-chat", "transcript"].includes(tag)).slice(0, 2);
+  return [memory.type, ...tags].filter(Boolean).join(" · ");
+}
+
+function shortAccountLabel(email) {
+  const value = String(email || "Signed in");
+  if (value.length <= 26) return value;
+  const [name, domain] = value.split("@");
+  if (!domain) return `${value.slice(0, 23)}...`;
+  return `${name.slice(0, 12)}...@${domain}`;
+}
+
 function cleanChatTitle(title) {
   return String(title || "Saved chat").replace(/\s+/g, " ").trim().slice(0, 120) || "Saved chat";
 }
@@ -589,11 +591,22 @@ function showFlow(flow) {
   el("saveFlow").classList.toggle("hidden", flow !== "save");
   el("useFlow").classList.toggle("hidden", flow !== "use");
   el("settingsFlow").classList.toggle("hidden", flow !== "settings");
+  if (flow === "use") showUseMode("search");
+}
+
+function showUseMode(mode) {
+  el("searchMode").classList.toggle("hidden", mode !== "search");
+  el("savedChatsMode").classList.toggle("hidden", mode !== "saved");
+  el("showSearchMode").classList.toggle("secondary", mode !== "search");
+  el("showSavedChatsMode").classList.toggle("secondary", mode !== "saved");
+  hideContextFallback();
 }
 
 el("showSaveFlow").addEventListener("click", () => showFlow("save"));
 el("showUseFlow").addEventListener("click", () => showFlow("use"));
 el("showSettingsFlow").addEventListener("click", () => showFlow("settings"));
+el("showSearchMode").addEventListener("click", () => showUseMode("search"));
+el("showSavedChatsMode").addEventListener("click", () => showUseMode("saved"));
 el("signIn").addEventListener("click", runSafely(signIn));
 el("signUp").addEventListener("click", runSafely(signUp));
 el("resetPassword").addEventListener("click", runSafely(resetPassword));
@@ -604,7 +617,6 @@ el("saveFullChat").addEventListener("click", runSafely(saveFullChatTranscript));
 el("generateSuggestions").addEventListener("click", runSafely(generateSuggestions));
 el("loadSavedChats").addEventListener("click", runSafely(loadSavedChats));
 el("searchVault").addEventListener("click", runSafely(() => searchVault()));
-el("useVaultContext").addEventListener("click", runSafely(buildContextFromCurrentPrompt));
 el("copyContext").addEventListener("click", runSafely(copyContextText));
 
 ["supabaseUrl", "supabaseAnonKey", "email", "passphrase", "maxMemories", "defaultSource", "autoApprove"].forEach((id) => {
@@ -616,6 +628,7 @@ document.addEventListener("click", (event) => {
   const rejectIndex = event.target?.dataset?.rejectSuggestion;
   const renameChatIndex = event.target?.dataset?.renameChat;
   const selectChatIndex = event.target?.dataset?.selectChat;
+  const useResultIndex = event.target?.dataset?.useResultIndex;
   if (saveIndex !== undefined) runSafely(() => saveSuggestion(Number(saveIndex)))();
   if (rejectIndex !== undefined) {
     state.suggestions.splice(Number(rejectIndex), 1);
@@ -623,11 +636,7 @@ document.addEventListener("click", (event) => {
   }
   if (renameChatIndex !== undefined) runSafely(() => renameSavedChat(Number(renameChatIndex)))();
   if (selectChatIndex !== undefined) selectSavedChat(Number(selectChatIndex));
-});
-
-document.addEventListener("change", (event) => {
-  const resultIndex = event.target?.dataset?.resultIndex;
-  if (resultIndex !== undefined) toggleSelected(state.results[Number(resultIndex)]);
+  if (useResultIndex !== undefined) runSafely(() => useSearchResult(Number(useResultIndex)))();
 });
 
 async function loadSettings() {

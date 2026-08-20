@@ -32,12 +32,11 @@
       </section>
 
       <section id="vaultPanel" class="panel hidden">
-        <div class="row between">
+        <div class="account-row">
           <span id="accountStatus" class="meta">Signed in</span>
           <button id="signOut" class="secondary">Sign out</button>
+          <label>Secret code<input id="passphrase" type="password" placeholder="Secret code" /></label>
         </div>
-        <label>Vault passphrase<input id="passphrase" type="password" placeholder="Same passphrase as web vault" /></label>
-        <p class="meta">The passphrase is only used locally to encrypt and decrypt memories.</p>
       </section>
 
       <section id="saveFlow" class="panel flow-panel hidden">
@@ -53,18 +52,24 @@
       </section>
 
       <section id="useFlow" class="panel flow-panel hidden">
-        <h2>Search Vault</h2>
-        <input id="searchQuery" placeholder="Search approved memories" />
-        <button id="searchVault">Search</button>
-        <div id="searchResults"></div>
-        <h2>Insert Context</h2>
-        <button id="useVaultContext">Use Vault Context</button>
+        <div class="mode-switch">
+          <button id="showSearchMode">Search Vault</button>
+          <button id="showSavedChatsMode" class="secondary">Saved Chats</button>
+        </div>
+        <section id="searchMode" class="mode-panel">
+          <div class="search-row">
+            <input id="searchQuery" placeholder="Search memories" />
+            <button id="searchVault">Search</button>
+          </div>
+          <div id="searchResults"></div>
+        </section>
+        <section id="savedChatsMode" class="mode-panel hidden">
+          <button id="loadSavedChats" class="secondary">Show saved chats</button>
+          <div id="savedChats"></div>
+        </section>
         <p id="contextHelp" class="meta hidden">Context is large, so copy it and paste it into the AI chat.</p>
         <textarea id="contextText" class="hidden" placeholder="Generated context text appears here."></textarea>
         <button id="copyContext" class="secondary hidden">Copy context text</button>
-        <h2>Saved Chats</h2>
-        <button id="loadSavedChats" class="secondary">Show saved chats</button>
-        <div id="savedChats"></div>
       </section>
 
       <section id="settingsFlow" class="panel hidden">
